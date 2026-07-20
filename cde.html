@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1"/>
+<meta name="description" content="Sports Snap - Free Football, Cricket &amp; Fancode Live Stream"/>
+<title>Sports Snap | Football · Cricket · Fancode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+<style>
+:root {
+  --bg:#f5f6f8;--surface:#ffffff;--border:#e4e6eb;--text:#111827;--muted:#6b7280;
+  --accent:#0f4cdb;--red:#e63946;--green:#16a34a;--amber:#f59e0b;
+  --r-sm:6px;--r-md:10px;--r-lg:16px;
+  --sh-sm:0 1px 4px rgba(0,0,0,.06);--sh-md:0 4px 16px rgba(0,0,0,.09);
+  --hdr-h:64px;--tab-h:52px;
+  --fd:'Barlow Condensed',sans-serif;--fb:'DM Sans',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh;overflow-x:hidden;width:100%}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+ul,ol{list-style:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulseDot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.7}}
+@keyframes slideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+@keyframes scrollX{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+.container{max-width:1060px;margin:0 auto;padding:0 16px}
+
+/* ── FEATURED BAR (top ticker) ── */
+.featured-bar{background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);border-bottom:1px solid rgba(255,255,255,.08);overflow:hidden;position:relative;width:100%;}
+.featured-inner{display:flex;align-items:stretch;height:58px;}
+.featured-label{display:flex;align-items:center;gap:6px;padding:0 16px;background:rgba(255,255,255,.07);border-right:1px solid rgba(255,255,255,.1);flex-shrink:0;font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#ffd166;white-space:nowrap;}
+.featured-label .hot-dot{width:7px;height:7px;background:var(--red);border-radius:50%;animation:blink 1s ease infinite;flex-shrink:0;}
+.featured-scroll-wrap{flex:1;overflow:hidden;position:relative;min-width:0;}
+.featured-scroll-wrap::before,.featured-scroll-wrap::after{content:'';position:absolute;top:0;bottom:0;width:40px;z-index:2;pointer-events:none;}
+.featured-scroll-wrap::before{left:0;background:linear-gradient(to right,#0f172a,transparent);}
+.featured-scroll-wrap::after{right:0;background:linear-gradient(to left,#0f172a,transparent);}
+.featured-track{display:inline-flex;align-items:center;gap:0;height:58px;animation:scrollX 40s linear infinite;white-space:nowrap;}
+.featured-track:hover{animation-play-state:paused;}
+.f-card{display:inline-flex;align-items:center;gap:10px;padding:0 18px;border-right:1px solid rgba(255,255,255,.07);height:100%;cursor:pointer;transition:background .2s;}
+.f-card:hover{background:rgba(255,255,255,.06);}
+.f-badge{font-family:var(--fd);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:3px;flex-shrink:0;line-height:16px;}
+.f-badge.wc{background:#e63946;color:#fff;}.f-badge.ucl{background:#1a56db;color:#fff;}.f-badge.ipl{background:#f59e0b;color:#111;}.f-badge.t20{background:#059669;color:#fff;}.f-badge.epl{background:#38003c;color:#fff;}.f-badge.odi{background:#0891b2;color:#fff;}.f-badge.laliga{background:#ff4500;color:#fff;}.f-badge.seriea{background:#1e3a6e;color:#fff;}.f-badge.test{background:#7c3aed;color:#fff;}.f-badge.default{background:#555;color:#fff;}
+.f-teams{display:flex;align-items:center;gap:6px;font-family:var(--fd);font-size:15px;font-weight:700;color:#f1f5f9;letter-spacing:.01em;}
+.f-vs{font-size:10px;font-weight:400;color:rgba(255,255,255,.4);letter-spacing:.05em;}
+.f-flag{font-size:16px;line-height:1;}
+.f-meta{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:90px;}
+.f-timer{font-size:11px;font-weight:700;font-family:var(--fd);letter-spacing:.04em;color:#fbbf24;white-space:nowrap;}
+.f-timer.is-live{color:#4ade80;animation:blink 1.4s ease infinite;}
+.f-timer.is-ended{color:rgba(255,255,255,.35);font-weight:400;}
+.f-timer.is-soon{color:#fbbf24;}
+.f-timer.is-countdown{color:#c4b5fd;}
+.f-venue{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.02em;}
+
+/* ── HEADER ── */
+.site-header{position:sticky;top:0;z-index:200;background:var(--surface);border-bottom:1px solid var(--border);box-shadow:var(--sh-sm);height:var(--hdr-h);width:100%}
+.hdr-inner{height:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 16px;max-width:1060px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0;cursor:pointer}
+.logo-img{height:38px;width:auto;display:block;object-fit:contain;}
+.logo-name{font-family:var(--fd);font-size:26px;font-weight:800;letter-spacing:-.01em;line-height:1}
+.logo-name span{color:var(--red)}
+.hdr-nav{display:flex;align-items:center;gap:4px}
+.hdr-nav .nav-link{font-size:13px;font-weight:500;color:var(--muted);padding:6px 12px;border-radius:var(--r-sm);transition:color .2s,background .2s;cursor:pointer;user-select:none}
+.hdr-nav .nav-link:hover{color:var(--text);background:var(--bg)}
+.hdr-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.btn-soc{width:34px;height:34px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;transition:opacity .2s,transform .15s;cursor:pointer}
+.btn-soc:hover{opacity:.85;transform:translateY(-1px)}
+.btn-soc.tg{background:#29b6f6}.btn-soc.yt{background:#ff0000}
+.btn-soc svg{width:16px;height:16px;fill:#fff}
+.btn-night{width:34px;height:34px;border-radius:var(--r-sm);background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;transition:background .2s}
+.btn-night:hover{background:var(--border)}
+.btn-night svg{width:16px;height:16px;stroke:var(--text);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn-ham{display:none;width:34px;height:34px;flex-direction:column;align-items:center;justify-content:center;gap:5px;border-radius:var(--r-sm);background:var(--bg);border:1px solid var(--border)}
+.btn-ham span{width:18px;height:2px;background:var(--text);border-radius:2px;transition:all .3s}
+.btn-ham.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.btn-ham.open span:nth-child(2){opacity:0}
+.btn-ham.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+.mob-nav{display:none;position:fixed;inset:var(--hdr-h) 0 0 0;background:rgba(0,0,0,.4);z-index:190;backdrop-filter:blur(2px)}
+.mob-nav.open{display:block}
+.mob-nav-inner{background:var(--surface);width:260px;height:100%;padding:20px 16px;display:flex;flex-direction:column;gap:6px;animation:slideIn .25s ease;box-shadow:var(--sh-md)}
+.mob-nav-inner .nav-link{padding:10px 14px;border-radius:var(--r-sm);font-weight:500;font-size:15px;color:var(--text);transition:background .2s;display:block;cursor:pointer}
+.mob-nav-inner .nav-link:hover{background:var(--bg)}
+.mob-soc{display:flex;gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+
+/* ── JOIN BANNER ── */
+.join-banner{padding:12px 0;animation:fadeUp .5s ease both}
+.join-inner{display:flex;gap:10px;flex-wrap:wrap}
+.join-btn{flex:1;min-width:180px;display:flex;align-items:center;justify-content:center;gap:10px;padding:11px 18px;border-radius:var(--r-md);font-family:var(--fd);font-size:16px;font-weight:700;letter-spacing:.02em;color:#fff;transition:transform .15s,box-shadow .15s;cursor:pointer;border:none}
+.join-btn:hover{transform:translateY(-2px);box-shadow:var(--sh-md)}
+.join-btn.tg{background:linear-gradient(135deg,#2ca5e0,#1d7bb5)}.join-btn.yt{background:linear-gradient(135deg,#ff4444,#c50000)}
+.join-btn svg{width:22px;height:22px;fill:#fff;flex-shrink:0}
+
+/* ── ADS ── */
+.ad-slot{text-align:center;padding:6px 0;margin-bottom:14px}
+.ad-label{font-size:10px;color:#bbb;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.ad-placeholder{display:inline-flex;align-items:center;justify-content:center;background:var(--bg);border:1px dashed var(--border);border-radius:var(--r-sm);font-size:12px;color:var(--muted)}
+
+/* ── PAGE GRID ── */
+.page-grid{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start;padding-bottom:80px;animation:fadeUp .55s .1s ease both}
+.sidebar{display:flex;flex-direction:column;gap:16px}
+
+/* ── FEATURED MATCHES ROW LIST (sits just above the tab card) ── */
+.feat-list-card{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--sh-sm);border:1px solid var(--border);margin-bottom:16px;overflow:hidden;width:100%}
+.feat-list-head{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:#fafbfc}
+.feat-list-title{font-family:var(--fd);font-size:15px;font-weight:800;letter-spacing:.03em;display:flex;align-items:center;gap:8px}
+.feat-list-title .dot{width:8px;height:8px;border-radius:50%;background:var(--amber);animation:pulseDot 1.6s ease infinite}
+.feat-list-body{display:flex;flex-direction:column}
+.feat-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.feat-row:last-child{border-bottom:none}
+.feat-row:hover{background:var(--bg)}
+.feat-match-name{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--text);letter-spacing:.01em;display:flex;align-items:center;gap:6px;min-width:0}
+.feat-match-name .fm-vs{font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.05em;flex-shrink:0}
+.feat-match-name .fm-team{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.feat-status{flex-shrink:0;text-align:center;padding:4px 10px;border-radius:var(--r-sm);font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:.03em;white-space:nowrap}
+.feat-status.s-live{background:var(--red);color:#fff;animation:blink 1.4s ease infinite}
+.feat-status.s-soon{background:#16a34a;color:#fff}
+.feat-status.s-upcoming{background:#263545;color:#fff}
+.feat-status.s-ended{background:#6b7280;color:#fff}
+.feat-empty{padding:16px;text-align:center;color:var(--muted);font-size:13px}
+
+/* ── SPORT CARD ── */
+.sport-card{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--sh-md);width:100%;min-width:0}
+
+/* ── TAB BAR ── */
+.tab-bar{display:flex;background:#f8f9fb;border-bottom:1px solid var(--border);border-radius:var(--r-lg) var(--r-lg) 0 0;overflow:hidden;width:100%}
+.tab-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 12px;height:var(--tab-h);font-family:var(--fd);font-size:17px;font-weight:700;letter-spacing:.03em;color:var(--muted);border-bottom:3px solid transparent;transition:color .2s,border-color .2s,background .2s;text-transform:uppercase;cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;min-width:0}
+.tab-btn:hover{color:var(--text);background:rgba(0,0,0,.03)}
+.tab-btn.act-foot{color:#0f4cdb;border-color:#0f4cdb}
+.tab-btn.act-cric{color:#16a34a;border-color:#16a34a}
+.tab-btn.act-fc{color:#f59e0b;border-color:#f59e0b}
+.tab-icon{width:22px;height:22px;flex-shrink:0}
+.live-badge{background:var(--red);color:#fff;font-family:var(--fd);font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:.06em;animation:blink 1.4s ease infinite;line-height:16px}
+.tab-panel{visibility:hidden;height:0;overflow:hidden;pointer-events:none}
+.tab-panel.active{visibility:visible;height:auto;overflow:visible;pointer-events:auto}
+.tab-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px;border-bottom:1px solid var(--border);gap:10px}
+.tab-heading{font-family:var(--fd);font-size:20px;font-weight:800;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+.tab-heading .dot{width:9px;height:9px;border-radius:50%;animation:pulseDot 1.6s ease infinite}
+.dot-foot{background:#0f4cdb}.dot-cric{background:#16a34a}.dot-fc{background:#f59e0b}
+.tab-date{font-size:13px;color:var(--muted);font-weight:400}
+
+/* ── MATCH CARDS IN PANEL (football / cricket) ── */
+.panel-matches{padding:12px 14px 16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.pm-card{border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);cursor:pointer;transition:box-shadow .2s,transform .15s;overflow:hidden;display:flex;flex-direction:column;position:relative;}
+.pm-card:hover{box-shadow:var(--sh-md);transform:translateY(-2px)}
+.pm-card-inner{display:flex;align-items:center;justify-content:space-around;padding:12px 8px 8px;gap:4px;}
+.pm-team{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1}
+.pm-logo{width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;}
+.pm-logo img{width:32px;height:32px;object-fit:contain}
+.pm-logo .pm-flag{font-size:22px;line-height:1}
+.pm-name{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text);letter-spacing:.01em;line-height:1.2;max-width:80px;word-break:break-word;text-align:center;}
+.pm-center{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;padding:0 4px}
+.pm-vs{font-family:var(--fd);font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.06em;}
+.pm-status{text-align:center;padding:3px 7px;border-radius:var(--r-sm);font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:.03em;line-height:1.5;white-space:nowrap;}
+.pm-status.s-live{background:var(--red);color:#fff;animation:blink 1.4s ease infinite}
+.pm-status.s-soon{background:#16a34a;color:#fff}
+.pm-status.s-upcoming{background:#263545;color:#fff}
+.pm-status.s-ended{background:#6b7280;color:#fff}
+.pm-info{border-top:1px solid var(--border);display:flex;width:100%;text-align:center;}
+.pm-info-item{flex:1;font-size:11px;font-weight:500;padding:4px 3px;border-right:1px solid var(--border);color:var(--muted);display:flex;align-items:center;justify-content:center;gap:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pm-info-item:last-child{border-right:none}
+.pm-badge{font-family:var(--fd);font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:1px 5px;border-radius:2px;color:#fff;flex-shrink:0;}
+.badge-wc{background:#e63946}.badge-ucl{background:#1a56db}.badge-ipl{background:#f59e0b;color:#111}.badge-t20{background:#059669}.badge-epl{background:#38003c}.badge-odi{background:#0891b2}.badge-laliga{background:#ff4500}.badge-seriea{background:#1e3a6e}.badge-test{background:#7c3aed}.badge-default{background:#555}
+.watch-over{position:absolute;inset:0;background:rgba(0,0,0,0);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s,background .2s;pointer-events:none;}
+.pm-card:hover .watch-over{opacity:1;background:rgba(0,0,0,.5);pointer-events:auto}
+.watch-play{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;}
+.watch-play svg{width:16px;height:16px;fill:#0f4cdb}
+
+/* Skeleton */
+.pm-skeleton{height:105px;border-radius:var(--r-md);background:linear-gradient(90deg,#eceef2 25%,#f8f9fb 50%,#eceef2 75%);background-size:400px 100%;animation:shimmer 1.4s ease infinite}
+.pm-empty{padding:20px;text-align:center;color:var(--muted);font-size:13px}
+
+/* ── FANCODE PANEL CARDS ── */
+.fc-card{border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);cursor:pointer;transition:box-shadow .2s,transform .15s;overflow:hidden;display:flex;flex-direction:column;position:relative;}
+.fc-card:hover{box-shadow:var(--sh-md);transform:translateY(-2px)}
+.fc-card.fc-disabled{cursor:default}
+.fc-card.fc-disabled:hover{box-shadow:none;transform:none}
+.fc-img-wrap{position:relative;width:100%;height:108px;background:#e9ebf0;overflow:hidden;flex-shrink:0}
+.fc-img-wrap img{width:100%;height:100%;object-fit:cover}
+.fc-live-tag{position:absolute;top:6px;left:6px;background:var(--red);color:#fff;font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:.05em;padding:2px 7px;border-radius:3px;animation:blink 1.4s ease infinite}
+.fc-cat-tag{position:absolute;top:6px;right:6px;font-family:var(--fd);font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:3px;color:#fff}
+.fcb-cricket{background:#16a34a}.fcb-tennis{background:#7c3aed}.fcb-golf{background:#f59e0b;color:#111}.fcb-formula1{background:#e63946}.fcb-motorsports{background:#0891b2}.fcb-default{background:#555}
+.fc-body{padding:9px 11px 10px;display:flex;flex-direction:column;gap:3px;flex:1}
+.fc-title{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text);line-height:1.25;letter-spacing:.01em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fc-tournament{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-meta-row{display:flex;align-items:center;justify-content:space-between;margin-top:5px;gap:6px}
+.fc-status{flex-shrink:0;text-align:center;padding:2px 7px;border-radius:var(--r-sm);font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:.03em;white-space:nowrap}
+.fc-status.s-live{background:var(--red);color:#fff;animation:blink 1.4s ease infinite}
+.fc-status.s-soon{background:#16a34a;color:#fff}
+.fc-status.s-upcoming{background:#263545;color:#fff}
+.fc-nolink{font-size:10px;color:var(--muted);font-style:italic}
+
+/* Fancode grid + empty/skeleton reuse panel-matches / pm-skeleton / pm-empty */
+
+/* ── SIDEBAR ── */
+.sb-card{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--sh-sm);overflow:hidden;border:1px solid var(--border)}
+.sb-title{font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:12px 16px;border-bottom:1px solid var(--border);background:#fafbfc}
+.ql-list{padding:8px 0}
+.ql-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:14px;font-weight:500;color:var(--text);transition:background .15s;cursor:pointer}
+.ql-item:hover{background:var(--bg)}
+.ql-ico{width:28px;height:28px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.ql-arr{margin-left:auto;color:var(--muted);font-size:11px}
+.sb-body{padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.65}
+.sb-body p{margin-bottom:10px}.sb-body p:last-child{margin-bottom:0}
+
+/* ── FOOTER ── */
+.site-footer{background:var(--surface);border-top:1px solid var(--border);padding:28px 0 20px;margin-top:40px}
+.foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:24px;margin-bottom:24px}
+.foot-col-title{font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.foot-links{display:flex;flex-direction:column;gap:6px}
+.foot-links .nav-link{font-size:13px;color:var(--muted);transition:color .15s;cursor:pointer}
+.foot-links .nav-link:hover{color:var(--accent)}
+.foot-desc{font-size:13px;color:var(--muted);line-height:1.65;margin-top:6px}
+.foot-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:18px;border-top:1px solid var(--border);gap:12px;flex-wrap:wrap}
+.foot-copy{font-size:12px;color:var(--muted)}
+.foot-soc{display:flex;gap:8px}
+
+/* ── STICKY BOTTOM AD ── */
+#fixedban{position:fixed;bottom:0;left:0;width:100%;text-align:center;z-index:999}
+.fixedban-inner{display:inline-block;position:relative;background:var(--surface);border-top:1px solid var(--border);box-shadow:0 -4px 16px rgba(0,0,0,.08);padding:6px 40px 6px 6px}
+.fixedban-close{position:absolute;top:-14px;right:6px;width:24px;height:24px;background:var(--red);border-radius:50%;color:#fff;font-size:14px;font-weight:700;line-height:24px;text-align:center;cursor:pointer;border:none}
+
+/* ── DARK MODE ── */
+body.night{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3a;--text:#e8eaf0;--muted:#7c8098}
+body.night .tab-bar{background:#141620}
+body.night .tab-header{background:#141620}
+body.night .sb-title{background:#141620}
+body.night .feat-list-head{background:#141620}
+body.night .featured-bar{background:linear-gradient(135deg,#080c14 0%,#130f2e 50%,#080c14 100%)}
+body.night .pm-card{background:#141620}
+body.night .fc-card{background:#141620}
+body.night .fc-img-wrap{background:#0d0f16}
+body.night .pm-logo{background:#1a1d27}
+body.night .pm-skeleton{background:linear-gradient(90deg,#1a1d27 25%,#141620 50%,#1a1d27 75%);background-size:400px 100%}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .page-grid{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .foot-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
+  .hdr-nav{display:none}
+  .btn-ham{display:flex}
+  .join-inner{flex-direction:column}
+  .join-btn{min-width:0;width:100%}
+  .foot-grid{grid-template-columns:1fr}
+  .tab-btn{font-size:13px;padding:0 8px;gap:5px}
+  .tab-icon{width:18px;height:18px}
+  .live-badge{display:none}
+  .sport-card{border-radius:0;box-shadow:none;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .foot-bottom{flex-direction:column;align-items:flex-start;gap:8px}
+  .featured-inner{height:44px;}
+  .featured-label{padding:0 10px;font-size:10px;gap:5px;}
+  .featured-label .hot-dot{width:6px;height:6px;}
+  .f-card{padding:0 10px;gap:6px;}
+  .f-teams{font-size:13px;gap:4px;}
+  .f-flag{font-size:13px;}
+  .f-badge{font-size:8px;padding:1px 4px;}
+  .f-venue{display:none;}
+  .f-meta{min-width:70px;}
+  .f-timer{font-size:10px;}
+  .container{padding:0}
+  .join-banner{padding:12px 16px}
+  .ad-slot{padding:6px 16px}
+  .page-grid{padding-bottom:80px}
+  .panel-matches{grid-template-columns:1fr 1fr;padding:10px}
+  .feat-list-card{border-radius:0;border-left:none;border-right:none}
+  .feat-row{padding:10px 14px}
+  .feat-match-name{font-size:13px}
+  .feat-status{font-size:11px;padding:3px 8px}
+}
+@media(max-width:420px){
+  :root{--hdr-h:56px;--tab-h:46px}
+  .logo-img{height:30px;}
+  .logo-name{font-size:20px;}
+  .tab-btn{font-size:12px;padding:0 6px;gap:4px}
+  .tab-icon{width:16px;height:16px}
+  .featured-inner{height:40px;}
+  .featured-label{padding:0 8px;font-size:9px;}
+  .f-card{padding:0 8px;gap:5px;}
+  .f-teams{font-size:12px;}
+  .panel-matches{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ── FEATURED BAR (populated by JS from matches.json) ── -->
+<div class="featured-bar" aria-label="Featured matches">
+  <div class="featured-inner">
+    <div class="featured-label">
+      <span class="hot-dot"></span>🔥 Hot Matches
+    </div>
+    <div class="featured-scroll-wrap">
+      <div class="featured-track" id="featuredTrack">
+        <!-- injected by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── HEADER ── -->
+<header class="site-header" role="banner">
+  <div class="hdr-inner">
+    <div class="logo" onclick="location.href='https://sportssnap.net'" role="link" aria-label="Sports Snap Home">
+      <img class="logo-img" src="https://i.ibb.co/BTM5dLF/sportssnap-logo.png" alt="Sports Snap" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+      <div class="logo-name" style="display:none">Sports<span>Snap</span></div>
+    </div>
+    <nav class="hdr-nav" aria-label="Main navigation">
+      <span class="nav-link" onclick="switchTab('foot')">Football</span>
+      <span class="nav-link" onclick="switchTab('cric')">Cricket</span>
+      <span class="nav-link" onclick="switchTab('fc')">Fancode</span>
+      <span class="nav-link" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">About</span>
+    </nav>
+    <div class="hdr-actions">
+      <span class="btn-soc tg" onclick="window.open('https://t.me/sportssnapofficial','_blank','noopener')" aria-label="Telegram">
+        <svg viewBox="0 0 24 24"><path d="m9.417 15.181-.397 5.584c.568 0 .814-.244 1.109-.537l2.663-2.545 5.518 4.041c1.012.564 1.725.267 1.998-.931l3.622-16.972c.321-1.496-.541-2.081-1.527-1.714l-21.29 8.151c-1.453.564-1.431 1.374-.247 1.741l5.443 1.693 12.643-7.911c.595-.394 1.136-.176.691.218z"/></svg>
+      </span>
+      <span class="btn-soc yt" onclick="window.open('https://www.youtube.com/channel/sportssnap2023','_blank','noopener')" aria-label="YouTube">
+        <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+      </span>
+      <button class="btn-night" id="nightToggle" aria-label="Toggle dark mode">
+        <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="btn-ham" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile Drawer -->
+<div class="mob-nav" id="mobNav" aria-hidden="true">
+  <div class="mob-nav-inner">
+    <span class="nav-link" onclick="switchTab('foot');closeMobNav()">⚽ Football Live</span>
+    <span class="nav-link" onclick="switchTab('cric');closeMobNav()">🏏 Cricket Live</span>
+    <span class="nav-link" onclick="switchTab('fc');closeMobNav()">📡 Fancode Live</span>
+    <span class="nav-link" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'});closeMobNav()">ℹ️ About</span>
+    <div class="mob-soc">
+      <span class="btn-soc tg" onclick="window.open('https://t.me/sportssnapofficial','_blank')" style="width:38px;height:38px;"><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#fff;"><path d="m9.417 15.181-.397 5.584c.568 0 .814-.244 1.109-.537l2.663-2.545 5.518 4.041c1.012.564 1.725.267 1.998-.931l3.622-16.972c.321-1.496-.541-2.081-1.527-1.714l-21.29 8.151c-1.453.564-1.431 1.374-.247 1.741l5.443 1.693 12.643-7.911c.595-.394 1.136-.176.691.218z"/></svg></span>
+      <span class="btn-soc yt" onclick="window.open('https://www.youtube.com/channel/sportssnap2023','_blank')" style="width:38px;height:38px;"><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#fff;"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></span>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<main>
+  <div class="container">
+
+    <div class="join-banner">
+      <div class="join-inner">
+        <button class="join-btn tg" onclick="window.open('https://t.me/sportssnapofficial','_blank','noopener')">
+          <svg viewBox="0 0 24 24"><path d="m9.417 15.181-.397 5.584c.568 0 .814-.244 1.109-.537l2.663-2.545 5.518 4.041c1.012.564 1.725.267 1.998-.931l3.622-16.972c.321-1.496-.541-2.081-1.527-1.714l-21.29 8.151c-1.453.564-1.431 1.374-.247 1.741l5.443 1.693 12.643-7.911c.595-.394 1.136-.176.691.218z"/></svg>
+          Join Us on Telegram
+        </button>
+        <button class="join-btn yt" onclick="window.open('https://www.youtube.com/channel/sportssnap2023','_blank','noopener')">
+          <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          Subscribe on YouTube
+        </button>
+      </div>
+    </div>
+
+    <div class="ad-slot">
+      <div class="ad-label">Advertisement</div>
+      <div class="ad-placeholder" style="width:728px;max-width:100%;height:90px;">Ad Space 728×90</div>
+    </div>
+
+    <div class="page-grid">
+      <div style="min-width:0">
+
+        <!-- ── FEATURED MATCHES ROW LIST (above the Football/Cricket/Fancode card) ── -->
+        <div class="feat-list-card" id="featListCard">
+          <div class="feat-list-head">
+            <div class="feat-list-title"><span class="dot"></span>⭐ Featured Matches</div>
+          </div>
+          <div class="feat-list-body" id="featListBody">
+            <div class="feat-empty">Loading featured matches…</div>
+          </div>
+        </div>
+
+        <div class="sport-card">
+
+          <div class="tab-bar" role="tablist">
+            <button class="tab-btn act-foot" id="tab-foot" role="tab" aria-selected="true" aria-controls="panel-foot" onclick="switchTab('foot')">
+              <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9.5"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/></svg>
+              Football
+              <span class="live-badge" id="foot-live-badge" style="display:none">LIVE</span>
+            </button>
+            <button class="tab-btn" id="tab-cric" role="tab" aria-selected="false" aria-controls="panel-cric" onclick="switchTab('cric')">
+              <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20L20 4" stroke-linecap="round"/><path d="M8 20L20 8" stroke-linecap="round"/><circle cx="5" cy="19" r="2.5" fill="currentColor" stroke="none"/></svg>
+              Cricket
+              <span class="live-badge" id="cric-live-badge" style="display:none;background:#16a34a">LIVE</span>
+            </button>
+            <button class="tab-btn" id="tab-fc" role="tab" aria-selected="false" aria-controls="panel-fc" onclick="switchTab('fc')">
+              <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 12v0"/><path d="M8.5 8.5a5 5 0 0 1 7 0M5.5 5.5a9 9 0 0 1 13 0" stroke-linecap="round"/><circle cx="12" cy="15.5" r="2" fill="currentColor" stroke="none"/></svg>
+              Fancode
+              <span class="live-badge" id="fc-live-badge" style="display:none;background:#f59e0b;color:#111">LIVE</span>
+            </button>
+          </div>
+
+          <!-- Football Panel -->
+          <div class="tab-panel active" id="panel-foot" role="tabpanel" aria-labelledby="tab-foot">
+            <div class="tab-header">
+              <div class="tab-heading"><span class="dot dot-foot"></span>Football Live</div>
+              <span class="tab-date" id="todayDate"></span>
+            </div>
+            <div id="foot-matches-grid" class="panel-matches">
+              <div class="pm-skeleton"></div><div class="pm-skeleton"></div><div class="pm-skeleton"></div><div class="pm-skeleton"></div>
+            </div>
+          </div>
+
+          <!-- Cricket Panel -->
+          <div class="tab-panel" id="panel-cric" role="tabpanel" aria-labelledby="tab-cric">
+            <div class="tab-header">
+              <div class="tab-heading"><span class="dot dot-cric"></span>Cricket Live</div>
+              <span class="tab-date" id="todayDate2"></span>
+            </div>
+            <div id="cric-matches-grid" class="panel-matches">
+              <div class="pm-skeleton"></div><div class="pm-skeleton"></div><div class="pm-skeleton"></div><div class="pm-skeleton"></div>
+            </div>
+          </div>
+
+          <!-- Fancode Panel -->
+          <div class="tab-panel" id="panel-fc" role="tabpanel" aria-labelledby="tab-fc">
+            <div class="tab-header">
+              <div class="tab-heading"><span class="dot dot-fc"></span>Fancode Live</div>
+              <span class="tab-date" id="fcMeta"></span>
+            </div>
+            <div id="fc-matches-grid" class="panel-matches">
+              <div class="pm-skeleton"></div><div class="pm-skeleton"></div><div class="pm-skeleton"></div><div class="pm-skeleton"></div>
+            </div>
+          </div>
+
+        </div><!-- /sport-card -->
+
+        <div class="ad-slot" style="margin-top:18px;padding:6px 0;">
+          <div class="ad-label">Advertisement</div>
+          <div class="ad-placeholder" style="width:728px;max-width:100%;height:90px;">Ad Space 728×90</div>
+        </div>
+      </div>
+
+      <aside class="sidebar" aria-label="Sidebar">
+        <div class="sb-card">
+          <div class="sb-title">Quick Links</div>
+          <nav class="ql-list">
+            <div class="ql-item" onclick="switchTab('foot')" role="link" tabindex="0">
+              <span class="ql-ico" style="background:#eff4ff">⚽</span> Football Live <span class="ql-arr">›</span>
+            </div>
+            <div class="ql-item" onclick="switchTab('cric')" role="link" tabindex="0">
+              <span class="ql-ico" style="background:#f0fdf4">🏏</span> Cricket Live <span class="ql-arr">›</span>
+            </div>
+            <div class="ql-item" onclick="switchTab('fc')" role="link" tabindex="0">
+              <span class="ql-ico" style="background:#fffbeb">📡</span> Fancode Live <span class="ql-arr">›</span>
+            </div>
+          </nav>
+        </div>
+        <div class="sb-card">
+          <div class="sb-title">Advertisement</div>
+          <div style="padding:10px;text-align:center;">
+            <div class="ad-placeholder" style="width:280px;max-width:100%;height:250px;">Ad Space 300×250</div>
+          </div>
+        </div>
+        <div class="sb-card" id="about">
+          <div class="sb-title">About Sports Snap</div>
+          <div class="sb-body">
+            <p>Sports Snap is a free sports aggregator providing links to live football, cricket and Fancode match streams from around the web.</p>
+            <p>We do not host or store any media. All streams are sourced from publicly available third-party platforms.</p>
+          </div>
+        </div>
+        <div class="sb-card">
+          <div class="sb-title">Follow Us</div>
+          <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px">
+            <button class="join-btn tg" onclick="window.open('https://t.me/sportssnapofficial','_blank')" style="font-size:14px;padding:9px 14px">
+              <svg style="width:18px;height:18px;fill:#fff" viewBox="0 0 24 24"><path d="m9.417 15.181-.397 5.584c.568 0 .814-.244 1.109-.537l2.663-2.545 5.518 4.041c1.012.564 1.725.267 1.998-.931l3.622-16.972c.321-1.496-.541-2.081-1.527-1.714l-21.29 8.151c-1.453.564-1.431 1.374-.247 1.741l5.443 1.693 12.643-7.911c.595-.394 1.136-.176.691.218z"/></svg>
+              Telegram Channel
+            </button>
+            <button class="join-btn yt" onclick="window.open('https://www.youtube.com/channel/sportssnap2023','_blank')" style="font-size:14px;padding:9px 14px">
+              <svg style="width:18px;height:18px;fill:#fff" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              YouTube Channel
+            </button>
+          </div>
+        </div>
+        <div class="sb-card">
+          <div class="sb-title">Advertisement</div>
+          <div style="padding:10px;text-align:center;">
+            <div class="ad-placeholder" style="width:280px;max-width:100%;height:250px;">Ad Space 300×250</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<!-- ── FOOTER ── -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <div class="logo" onclick="location.href='https://sportssnap.github.io/footlive/foot'" style="margin-bottom:10px;cursor:pointer">
+          <img class="logo-img" src="https://i.ibb.co/BTM5dLF/sportssnap-logo.png" alt="Sports Snap" style="height:28px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+          <div class="logo-name" style="display:none;font-size:20px">Sports<span>Snap</span></div>
+        </div>
+        <p class="foot-desc">Free sports streaming aggregator. Links to publicly available streams for football, cricket and Fancode events worldwide.</p>
+      </div>
+      <div>
+        <div class="foot-col-title">Pages</div>
+        <nav class="foot-links">
+          <span class="nav-link" onclick="switchTab('foot')">Football Live</span>
+          <span class="nav-link" onclick="switchTab('cric')">Cricket Live</span>
+          <span class="nav-link" onclick="switchTab('fc')">Fancode Live</span>
+        </nav>
+      </div>
+      <div>
+        <div class="foot-col-title">Legal</div>
+        <nav class="foot-links">
+          <span class="nav-link">DMCA / Disclaimer</span>
+          <span class="nav-link">Privacy Policy</span>
+          <span class="nav-link">Contact Us</span>
+        </nav>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p class="foot-copy">© <span id="footYear"></span> Sports Snap. All streams are sourced from third-party platforms.</p>
+      <div class="foot-soc">
+        <span class="btn-soc tg" onclick="window.open('https://t.me/sportssnapofficial','_blank')" aria-label="Telegram"><svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#fff"><path d="m9.417 15.181-.397 5.584c.568 0 .814-.244 1.109-.537l2.663-2.545 5.518 4.041c1.012.564 1.725.267 1.998-.931l3.622-16.972c.321-1.496-.541-2.081-1.527-1.714l-21.29 8.151c-1.453.564-1.431 1.374-.247 1.741l5.443 1.693 12.643-7.911c.595-.394 1.136-.176.691.218z"/></svg></span>
+        <span class="btn-soc yt" onclick="window.open('https://www.youtube.com/channel/sportssnap2023','_blank')" aria-label="YouTube"><svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#fff"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div id="fixedban">
+  <div class="fixedban-inner">
+    <button class="fixedban-close" onclick="document.getElementById('fixedban').style.display='none'" aria-label="Close ad">×</button>
+    <div class="ad-placeholder" style="width:320px;height:50px;">Ad Space 320×50</div>
+  </div>
+</div>
+
+<script>
+/* ── Utils ── */
+function eid(id){return document.getElementById(id)}
+function getStatus(start,end){
+  var now=new Date(),s=new Date(start),e=new Date(end);
+  if(now<s)return'upcoming';
+  if(now>=s&&now<=e)return'live';
+  return'ended';
+}
+function formatCountdown(ms){
+  var s=Math.floor(ms/1000),d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),m=Math.floor((s%3600)/60),sec=s%60;
+  if(d>0)return d+'d '+h+'h '+m+'m';
+  if(h>0)return h+'h '+m+'m '+sec+'s';
+  return m+'m '+sec+'s';
+}
+
+/* ── Dates ── */
+var ds=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+eid('todayDate').textContent=ds;
+eid('todayDate2').textContent=ds;
+eid('footYear').textContent=new Date().getFullYear();
+
+/* ── Night Mode ── */
+if(localStorage.getItem('night')==='1')document.body.classList.add('night');
+eid('nightToggle').addEventListener('click',function(){
+  localStorage.setItem('night',document.body.classList.toggle('night')?'1':'0');
+});
+
+/* ── Mobile Menu ── */
+var menuBtn=eid('menuBtn'),mobNav=eid('mobNav');
+function closeMobNav(){menuBtn.classList.remove('open');mobNav.classList.remove('open');menuBtn.setAttribute('aria-expanded','false');mobNav.setAttribute('aria-hidden','true');}
+menuBtn.addEventListener('click',function(){
+  var open=menuBtn.classList.toggle('open');
+  mobNav.classList.toggle('open',open);
+  menuBtn.setAttribute('aria-expanded',String(open));
+  mobNav.setAttribute('aria-hidden',String(!open));
+});
+mobNav.addEventListener('click',function(e){if(e.target===mobNav)closeMobNav();});
+
+/* ── Tab System ── */
+var currentTab='foot';
+var tabColors={foot:'act-foot',cric:'act-cric',fc:'act-fc'};
+function switchTab(key){
+  if(key===currentTab)return;
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('act-foot','act-cric','act-fc');b.setAttribute('aria-selected','false');});
+  eid('tab-'+key).classList.add(tabColors[key]);
+  eid('tab-'+key).setAttribute('aria-selected','true');
+  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+  eid('panel-'+key).classList.add('active');
+  currentTab=key;
+  if(key==='fc'&&!fcLoaded)loadFancode();
+}
+
+/* ── Build a match card (Football / Cricket) ── */
+function logoHtml(logo,flag,name){
+  if(logo)return '<div class="pm-logo"><img src="'+logo+'" alt="'+name+'" onerror="this.parentNode.innerHTML=\'<span class=pm-flag>'+flag+'</span>\'"/></div>';
+  return '<div class="pm-logo"><span class="pm-flag">'+flag+'</span></div>';
+}
+function buildCard(m){
+  var status=getStatus(m.start,m.end);
+  var now=new Date(),start=new Date(m.start);
+  var label='',cls='';
+  if(status==='live'){label='● LIVE NOW';cls='s-live';}
+  else if(status==='ended'){label='Ended';cls='s-ended';}
+  else{var diff=start-now;label='⏱ '+formatCountdown(diff);cls=diff<3600000?'s-soon':'s-upcoming';}
+  var badgeCls='badge-'+(m.badge||'default');
+  return '<div class="pm-card" data-start="'+m.start+'" data-end="'+m.end+'" onclick="location.href=\''+m.stream_url+'\'">'
+    +'<div class="pm-card-inner">'
+      +'<div class="pm-team">'+logoHtml(m.home_logo,m.home_flag,m.home_team)+'<div class="pm-name">'+m.home_team+'</div></div>'
+      +'<div class="pm-center"><div class="pm-vs">VS</div><div class="pm-status '+cls+'">'+label+'</div></div>'
+      +'<div class="pm-team">'+logoHtml(m.away_logo,m.away_flag,m.away_team)+'<div class="pm-name">'+m.away_team+'</div></div>'
+    +'</div>'
+    +'<div class="pm-info">'
+      +'<div class="pm-info-item"><span class="pm-badge '+badgeCls+'">'+m.competition_short+'</span></div>'
+      +'<div class="pm-info-item" style="font-size:10px">📍 '+(m.venue||'TBC')+'</div>'
+      +(m.format?'<div class="pm-info-item">'+m.format+'</div>':'')
+    +'</div>'
+    +'<div class="watch-over"><div class="watch-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>'
+  +'</div>';
+}
+
+/* ── Sort: live → upcoming soonest → ended ── */
+function sortMatches(arr){
+  return arr.slice().sort(function(a,b){
+    var ord={live:0,upcoming:1,ended:2};
+    var sa=getStatus(a.start,a.end),sb=getStatus(b.start,b.end);
+    if(ord[sa]!==ord[sb])return ord[sa]-ord[sb];
+    return new Date(a.start)-new Date(b.start);
+  });
+}
+
+/* ── Render Football / Cricket panels ── */
+function renderPanels(matches){
+  var football=matches.filter(function(m){return m.sport==='football';});
+  var cricket=matches.filter(function(m){return m.sport==='cricket';});
+
+  // Count live
+  var liveFoot=football.filter(function(m){return getStatus(m.start,m.end)==='live';}).length;
+  var liveCric=cricket.filter(function(m){return getStatus(m.start,m.end)==='live';}).length;
+  var fb=eid('foot-live-badge'),cb=eid('cric-live-badge');
+  if(liveFoot>0){fb.style.display='inline-block';}
+  if(liveCric>0){cb.style.display='inline-block';}
+
+  // Render football
+  var fg=eid('foot-matches-grid');
+  if(football.length){fg.innerHTML=sortMatches(football).map(buildCard).join('');}
+  else{fg.innerHTML='<div class="pm-empty">No football matches scheduled.</div>';}
+
+  // Render cricket
+  var cg=eid('cric-matches-grid');
+  if(cricket.length){cg.innerHTML=sortMatches(cricket).map(buildCard).join('');}
+  else{cg.innerHTML='<div class="pm-empty">No cricket matches scheduled.</div>';}
+
+  // Build hot-matches ticker + featured matches row list (both sourced from matches.json)
+  buildFeatured(matches);
+  buildFeaturedList(matches);
+
+  // Start timers
+  startTimers();
+}
+
+/* ── Hot Matches ticker (top bar) — uses hot_match:"yes" ── */
+function buildFeatured(matches){
+  var track=eid('featuredTrack');
+  var featured=matches.filter(function(m){return m.hot_match==='yes';});
+  if(!featured.length)featured=matches.slice(0,7); // fallback: show all if none marked hot
+  var html=featured.map(function(m){
+    return '<div class="f-card" data-start="'+m.start+'" data-end="'+m.end+'" onclick="location.href=\''+m.stream_url+'\'">'
+      +'<span class="f-badge '+(m.badge||'default')+'">'+m.competition_short+'</span>'
+      +'<div class="f-teams"><span class="f-flag">'+m.home_flag+'</span> '+m.home_team+' <span class="f-vs">VS</span> <span class="f-flag">'+m.away_flag+'</span> '+m.away_team+'</div>'
+      +'<div class="f-meta"><span class="f-timer"></span><span class="f-venue">'+( m.venue||'')+'</span></div>'
+    +'</div>';
+  }).join('');
+  // Duplicate for seamless scroll
+  track.innerHTML=html+html;
+  updateFeaturedTimers();
+}
+
+/* ── Featured Matches row list (above tab card) — uses featured_match:"yes" ── */
+function buildFeaturedList(matches){
+  var body=eid('featListBody');
+  var card=eid('featListCard');
+  var list=matches.filter(function(m){return m.featured_match==='yes';});
+  if(!list.length){
+    card.style.display='none';
+    return;
+  }
+  card.style.display='block';
+  list=sortMatches(list);
+  body.innerHTML=list.map(function(m){
+    return '<div class="feat-row" data-start="'+m.start+'" data-end="'+m.end+'" onclick="location.href=\''+m.stream_url+'\'">'
+      +'<div class="feat-match-name"><span class="fm-team">'+m.home_team+'</span><span class="fm-vs">vs</span><span class="fm-team">'+m.away_team+'</span></div>'
+      +'<div class="feat-status"></div>'
+    +'</div>';
+  }).join('');
+  updateFeaturedListTimers();
+}
+
+/* ── Timers ── */
+var timerInterval=null;
+function startTimers(){
+  if(timerInterval)clearInterval(timerInterval);
+  timerInterval=setInterval(function(){
+    updateTimerLabels();
+    updateFeaturedTimers();
+    updateFeaturedListTimers();
+    if(fcLoaded)updateFcTimers();
+  },1000);
+}
+function updateTimerLabels(){
+  var now=new Date();
+  document.querySelectorAll('.pm-card[data-start]').forEach(function(card){
+    var box=card.querySelector('.pm-status');if(!box)return;
+    var start=new Date(card.getAttribute('data-start')),end=new Date(card.getAttribute('data-end'));
+    var status=now<start?'upcoming':(now<=end?'live':'ended');
+    box.className='pm-status ';
+    if(status==='live'){box.className+='s-live';box.textContent='● LIVE NOW';}
+    else if(status==='ended'){box.className+='s-ended';box.textContent='Ended';}
+    else{var diff=start-now;box.textContent='⏱ '+formatCountdown(diff);box.className+=diff<3600000?'s-soon':'s-upcoming';}
+  });
+}
+function updateFeaturedTimers(){
+  var now=new Date();
+  document.querySelectorAll('.f-card[data-start]').forEach(function(card){
+    var t=card.querySelector('.f-timer');if(!t)return;
+    var start=new Date(card.getAttribute('data-start')),end=new Date(card.getAttribute('data-end'));
+    t.className='f-timer';
+    if(now>=start&&now<=end){t.textContent='● LIVE NOW';t.classList.add('is-live');}
+    else if(now>end){t.textContent='Match Ended';t.classList.add('is-ended');}
+    else{var diff=start-now;t.textContent=formatCountdown(diff);t.classList.add(diff<3600000?'is-soon':'is-countdown');}
+  });
+}
+function updateFeaturedListTimers(){
+  var now=new Date();
+  document.querySelectorAll('.feat-row[data-start]').forEach(function(row){
+    var box=row.querySelector('.feat-status');if(!box)return;
+    var start=new Date(row.getAttribute('data-start')),end=new Date(row.getAttribute('data-end'));
+    var status=now<start?'upcoming':(now<=end?'live':'ended');
+    box.className='feat-status ';
+    if(status==='live'){box.className+='s-live';box.textContent='● LIVE';}
+    else if(status==='ended'){box.className+='s-ended';box.textContent='Ended';}
+    else{var diff=start-now;box.textContent='⏱ '+formatCountdown(diff);box.className+=diff<3600000?'s-soon':'s-upcoming';}
+  });
+}
+
+/* ── Fetch matches.json (Football / Cricket / Hot Matches / Featured Matches) ── */
+fetch('https://sportssnap.github.io/fmatch/matches.json')
+  .then(function(r){return r.json();})
+  .then(function(data){renderPanels(data.matches);})
+  .catch(function(){
+    eid('foot-matches-grid').innerHTML='<div class="pm-empty">⚠️ Could not load matches. Please refresh.</div>';
+    eid('cric-matches-grid').innerHTML='<div class="pm-empty">⚠️ Could not load matches. Please refresh.</div>';
+    eid('featListCard').style.display='none';
+  });
+
+/* ══════════════════════════ FANCODE PANEL ══════════════════════════ */
+var fcLoaded=false;
+
+/* FanCode gives dates like "20 July 2026 02:30 PM" in IST (+05:30) with no explicit offset */
+function parseFcDate(str){
+  var months={January:'01',February:'02',March:'03',April:'04',May:'05',June:'06',July:'07',August:'08',September:'09',October:'10',November:'11',December:'12'};
+  var m=String(str||'').match(/(\d{1,2}) (\w+) (\d{4}) (\d{1,2}):(\d{2}) (AM|PM)/);
+  if(!m)return new Date(str);
+  var day=('0'+m[1]).slice(-2),month=months[m[2]]||'01',year=m[3];
+  var hour=parseInt(m[4],10),min=m[5],ap=m[6];
+  if(ap==='PM'&&hour!==12)hour+=12;
+  if(ap==='AM'&&hour===12)hour=0;
+  hour=('0'+hour).slice(-2);
+  return new Date(year+'-'+month+'-'+day+'T'+hour+':'+min+':00+05:30');
+}
+function fcCatClass(cat){
+  var key=String(cat||'').toLowerCase().replace(/\s+/g,'');
+  var known=['cricket','tennis','golf','formula1','motorsports'];
+  return known.indexOf(key)>-1?'fcb-'+key:'fcb-default';
+}
+function fcBestStream(m){
+  if(!m.streams)return'';
+  return m.streams.primary||m.streams.fancode_cdn||m.streams.fancode_bd_cdn||m.streams.fancode_np_cdn||m.streams.fancode_lk_cdn||'';
+}
+function buildFcCard(m){
+  var start=parseFcDate(m.startTime);
+  var isLive=String(m.status||'').toUpperCase()==='LIVE';
+  var stream=fcBestStream(m);
+  var statusHtml='';
+  if(isLive){
+    statusHtml='<span class="fc-status s-live">● LIVE</span>';
+  }else{
+    var diff=start-new Date();
+    if(diff<=0){statusHtml='<span class="fc-status s-soon">Starting soon</span>';}
+    else{statusHtml='<span class="fc-status '+(diff<3600000?'s-soon':'s-upcoming')+'">⏱ '+formatCountdown(diff)+'</span>';}
+  }
+  var clickAttr=stream?(' onclick="location.href=\''+stream+'\'"'):'';
+  var linkNote=stream?'':'<span class="fc-nolink">Link not live yet</span>';
+  return '<div class="fc-card'+(stream?'':' fc-disabled')+'" data-start="'+start.toISOString()+'" data-status="'+(m.status||'')+'"'+clickAttr+'>'
+    +'<div class="fc-img-wrap">'
+      +'<img src="'+(m.image||'')+'" alt="'+m.title+'" onerror="this.style.opacity=0"/>'
+      +(isLive?'<span class="fc-live-tag">LIVE</span>':'')
+      +'<span class="fc-cat-tag '+fcCatClass(m.category)+'">'+(m.category||'')+'</span>'
+    +'</div>'
+    +'<div class="fc-body">'
+      +'<div class="fc-title">'+m.title+'</div>'
+      +'<div class="fc-tournament">'+(m.tournament||'')+'</div>'
+      +'<div class="fc-meta-row">'+statusHtml+linkNote+'</div>'
+    +'</div>'
+  +'</div>';
+}
+function sortFcMatches(arr){
+  return arr.slice().sort(function(a,b){
+    var aLive=String(a.status||'').toUpperCase()==='LIVE',bLive=String(b.status||'').toUpperCase()==='LIVE';
+    if(aLive!==bLive)return aLive?-1:1;
+    return parseFcDate(a.startTime)-parseFcDate(b.startTime);
+  });
+}
+function loadFancode(){
+  fcLoaded=true;
+  fetch('https://raw.githubusercontent.com/kajju027/Fancode-Events-Json/refs/heads/main/fancode.json')
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var matches=data.matches||[];
+      var grid=eid('fc-matches-grid');
+      if(matches.length){grid.innerHTML=sortFcMatches(matches).map(buildFcCard).join('');}
+      else{grid.innerHTML='<div class="pm-empty">No Fancode events scheduled.</div>';}
+
+      var liveCount=matches.filter(function(m){return String(m.status||'').toUpperCase()==='LIVE';}).length;
+      if(liveCount>0)eid('fc-live-badge').style.display='inline-block';
+
+      var meta=(data.live_matches!=null?data.live_matches:liveCount)+' live • '+(data.total_matches!=null?data.total_matches:matches.length)+' matches';
+      eid('fcMeta').textContent=meta;
+    })
+    .catch(function(){
+      eid('fc-matches-grid').innerHTML='<div class="pm-empty">⚠️ Could not load Fancode events. Please refresh.</div>';
+      fcLoaded=false;
+    });
+}
+function updateFcTimers(){
+  var now=new Date();
+  document.querySelectorAll('.fc-card[data-start]').forEach(function(card){
+    var box=card.querySelector('.fc-status');if(!box)return;
+    var isLive=card.getAttribute('data-status')==='LIVE';
+    if(isLive)return; // live tag stays static
+    var start=new Date(card.getAttribute('data-start'));
+    var diff=start-now;
+    box.className='fc-status ';
+    if(diff<=0){box.className+='s-soon';box.textContent='Starting soon';}
+    else{box.className+=diff<3600000?'s-soon':'s-upcoming';box.textContent='⏱ '+formatCountdown(diff);}
+  });
+}
+</script>
+
+</body>
+</html>
