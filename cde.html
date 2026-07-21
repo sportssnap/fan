@@ -25,7 +25,6 @@ input,textarea{font-family:inherit;font-size:14px}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 @keyframes pulseDot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.7}}
 .container{max-width:820px;margin:0 auto;padding:0 16px}
-
 /* top bar */
 .topbar{background:var(--surface);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center}
 .topbar-inner{max-width:820px;margin:0 auto;padding:0 16px;width:100%;display:flex;align-items:center;gap:10px}
@@ -33,7 +32,6 @@ input,textarea{font-family:inherit;font-size:14px}
 .back-link:hover{color:var(--text)}
 .topbar .logo-name{font-family:var(--fd);font-size:20px;font-weight:800;margin-left:auto}
 .topbar .logo-name span{color:var(--red)}
-
 /* hero */
 .hero{position:relative;width:100%;aspect-ratio:16/8;background:#0f1117;overflow:hidden}
 .hero img{width:100%;height:100%;object-fit:cover;opacity:.55}
@@ -46,14 +44,12 @@ input,textarea{font-family:inherit;font-size:14px}
 .tag-upcoming{background:#263545}
 .hero-title{font-family:var(--fd);font-size:26px;font-weight:800;line-height:1.15;letter-spacing:.01em;text-shadow:0 2px 8px rgba(0,0,0,.4)}
 .hero-sub{font-size:13px;color:rgba(255,255,255,.75);margin-top:4px}
-
 /* main content */
 .section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-top:16px;overflow:hidden}
 .section-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:#fafbfc}
 .section-head .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulseDot 1.6s ease infinite}
 .section-title{font-family:var(--fd);font-size:15px;font-weight:800;letter-spacing:.03em}
 .section-body{padding:16px}
-
 /* status row */
 .status-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .status-chip{font-family:var(--fd);font-size:14px;font-weight:700;padding:6px 14px;border-radius:var(--r-sm);letter-spacing:.02em}
@@ -62,7 +58,6 @@ input,textarea{font-family:inherit;font-size:14px}
 .status-chip.upcoming{background:#263545;color:#fff}
 .status-meta{font-size:13px;color:var(--muted)}
 .status-meta b{color:var(--text)}
-
 /* player */
 .player-wrap{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:var(--r-md);overflow:hidden}
 .player-wrap video{width:100%;height:100%;background:#000}
@@ -74,7 +69,6 @@ input,textarea{font-family:inherit;font-size:14px}
 .player-msg .ring{width:34px;height:34px;border:3px solid rgba(255,255,255,.2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .player-msg p{font-size:13px;max-width:340px}
-
 /* prediction */
 .predict-teams{display:flex;flex-direction:column;gap:10px}
 .predict-btn{position:relative;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--r-md);cursor:pointer;overflow:hidden;transition:border-color .2s}
@@ -87,7 +81,6 @@ input,textarea{font-family:inherit;font-size:14px}
 .predict-btn.chosen .pb-pct{color:var(--accent)}
 .predict-note{margin-top:10px;font-size:12px;color:var(--muted)}
 .predict-empty{font-size:13px;color:var(--muted)}
-
 /* comments */
 .comment-form{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
 .comment-form input,.comment-form textarea{padding:10px 12px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--bg);color:var(--text)}
@@ -105,24 +98,33 @@ input,textarea{font-family:inherit;font-size:14px}
 .comment-time{font-size:11.5px;color:var(--muted)}
 .comment-text{font-size:14px;color:var(--text);margin-left:34px;word-break:break-word}
 .comment-empty{font-size:13px;color:var(--muted)}
-
+.quality-select-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.quality-btn{font-family:var(--fd);font-size:12.5px;font-weight:700;letter-spacing:.03em;padding:6px 13px;border-radius:var(--r-sm);border:1.5px solid var(--border);color:var(--muted);background:var(--surface);transition:all .15s}
+.quality-btn:hover{border-color:var(--accent);color:var(--text)}
+.quality-btn.active{background:var(--accent);border-color:var(--accent);color:#111}
+.quality-note{font-size:12px;color:var(--muted);margin-top:10px}
+/* details grid */
+.details-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px}
+.detail-item{display:flex;flex-direction:column;gap:3px}
+.detail-label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.detail-value{font-size:14.5px;font-weight:600;color:var(--text)}
+.quality-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.quality-chip{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:.03em;padding:2px 8px;border-radius:4px;background:rgba(245,158,11,.14);color:#b45309}
+.cat-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--fd);font-weight:700;font-size:14px;padding:4px 12px;border-radius:var(--r-sm);color:#fff}
+.cat-cricket{background:#16a34a}.cat-tennis{background:#7c3aed}.cat-golf{background:#f59e0b;color:#111}.cat-formula1{background:#e63946}.cat-motorsports{background:#0891b2}.cat-default{background:#555}
 .not-found{padding:60px 16px;text-align:center;color:var(--muted)}
 .not-found a{color:var(--accent);font-weight:600}
-
 .footer-note{margin:24px 0 40px;text-align:center;font-size:12px;color:var(--muted)}
 </style>
 </head>
 <body>
-
 <div class="topbar">
   <div class="topbar-inner">
     <a class="back-link" href="https://sportssnap.net">← Back to Sports Snap</a>
     <div class="logo-name">Sports<span>Snap</span></div>
   </div>
 </div>
-
 <div id="app"></div>
-
 <script>
 function eid(id){return document.getElementById(id)}
 function esc(s){
@@ -133,7 +135,6 @@ function esc(s){
 function qs(name){
   return new URLSearchParams(location.search).get(name);
 }
-
 /* ── date parsing (same convention as the main site: "20 July 2026 02:30 PM" in IST) ── */
 function parseFcDate(str){
   var months={January:'01',February:'02',March:'03',April:'04',May:'05',June:'06',July:'07',August:'08',September:'09',October:'10',November:'11',December:'12'};
@@ -160,10 +161,8 @@ function fcCatClass(cat){
 function fmtFull(d){
   return d.toLocaleString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
 }
-
 var matchId=qs('id');
 var app=eid('app');
-
 fetch('https://raw.githubusercontent.com/kajju027/Fancode-Events-Json/refs/heads/main/fancode.json')
   .then(function(r){return r.json();})
   .then(function(data){
@@ -172,19 +171,16 @@ fetch('https://raw.githubusercontent.com/kajju027/Fancode-Events-Json/refs/heads
     renderMatch(m);
   })
   .catch(function(){ renderNotFound(true); });
-
 function renderNotFound(isError){
   app.innerHTML='<div class="container"><div class="not-found">'
     +'<p>'+(isError?'⚠️ Could not load match data. Please refresh.':'Match not found.')+'</p>'
     +'<p style="margin-top:10px"><a href="https://sportssnap.net">Go back to Sports Snap</a></p>'
   +'</div></div>';
 }
-
 function renderMatch(m){
   var start=parseFcDate(m.startTime);
   var isLive=String(m.status||'').toUpperCase()==='LIVE';
   var catKey=fcCatClass(m.category);
-
   app.innerHTML=
     '<div class="hero">'
       +'<img id="heroImg" src="'+esc(m.image||'')+'" alt="'+esc(m.title)+'" onerror="this.style.display=\'none\'"/>'
@@ -198,7 +194,6 @@ function renderMatch(m){
       +'</div>'
     +'</div>'
     +'<div class="container">'
-
       +'<div class="section" id="statusSection">'
         +'<div class="section-head"><span class="dot"></span><span class="section-title">Match Status</span></div>'
         +'<div class="section-body">'
@@ -208,16 +203,15 @@ function renderMatch(m){
           +'</div>'
         +'</div>'
       +'</div>'
-
       +'<div class="section">'
         +'<div class="section-head"><span class="dot"></span><span class="section-title">Watch</span></div>'
         +'<div class="section-body">'
           +'<div class="player-wrap" id="playerWrap"></div>'
+          +'<div class="quality-select-row" id="qualityRow"></div>'
         +'</div>'
       +'</div>'
-
+      +'<div class="section" id="detailsSection"></div>'
       +'<div class="section" id="predictSection"></div>'
-
       +'<div class="section">'
         +'<div class="section-head"><span class="dot"></span><span class="section-title">Comments</span></div>'
         +'<div class="section-body">'
@@ -229,23 +223,20 @@ function renderMatch(m){
           +'<div class="comment-list" id="commentList"></div>'
         +'</div>'
       +'</div>'
-
       +'<p class="footer-note">Sports Snap does not host or store any media. Match data is provided by third-party public feeds and may be delayed or inaccurate.</p>'
     +'</div>';
-
   updateStatus(m,start,isLive);
   setInterval(function(){updateStatus(m,start,isLive);},1000);
-
   setupPlayer(m,isLive);
+  setupDetails(m,start);
   setupPrediction(m);
   setupComments(m);
 }
-
 function updateStatus(m,start,isLiveFixed){
   var chip=eid('statusChip');
   if(!chip)return;
   var now=new Date();
-  var isLive=isLiveFixed; // FanCode's own status flag is authoritative (no end-time is provided by the feed)
+  var isLive=isLiveFixed;
   if(isLive){
     chip.className='status-chip live';
     chip.textContent='● LIVE NOW';
@@ -263,63 +254,121 @@ function updateStatus(m,start,isLiveFixed){
     }
   }
 }
-
-/* ── PLAYER ──
-   Notes on what this does and doesn't do:
-   - Plays the match's "primary" auto-stream only (the one the feed marks as directly playable).
-   - The bd/np/lk backup CDN entries are intentionally NOT used — they're regional
-     mirrors that aren't meant for general playback and aren't reliable/legit sources to pull from here.
-   - This does NOT include any DRM key-bypass or third-party circumvention proxy. Adding a
-     proxy specifically to defeat FanCode's hotlink/access protections, or hardcoding DRM
-     ClearKeys to decrypt a paid feed (as in the reference PPV example), is exactly the kind
-     of unauthorized redistribution of paid content I'm not able to help build — regardless of framing.
-     If you have your own licensed/legitimate stream source, just drop its URL into
-     `sourceUrl` below and this player will handle it normally.
-*/
+/* ── PLAYER ── */
 function setupPlayer(m,isLive){
   var wrap=eid('playerWrap');
   var sourceUrl=(m.streams&&m.streams.primary)?m.streams.primary:'';
+
+  // === PROXY ADDED HERE ===
+  if(sourceUrl){
+    sourceUrl = 'https://fuck-you.kasin-tv.com/fc/proxy.php/' + sourceUrl;
+  }
+  // ========================
 
   if(!isLive || !sourceUrl){
     wrap.innerHTML='<div class="player-msg"><p>'+(isLive?'No playable stream is available for this event right now.':'The player will appear here once this event goes live.')+'</p></div>';
     return;
   }
-
   wrap.innerHTML=
     '<video id="fcVideo" controls playsinline muted></video>'
     +'<div class="player-overlay player-logo"><img src="https://i.ibb.co/BTM5dLF/sportssnap-logo.png" alt="Sports Snap"/></div>'
     +'<div class="player-overlay player-watermark">sportssnap.net</div>'
     +'<div class="player-msg" id="playerMsg"><div class="ring"></div><p>Loading stream…</p></div>';
-
   var video=eid('fcVideo');
   var msg=eid('playerMsg');
-
-  function ready(){ if(msg)msg.remove(); video.muted=false; video.play().catch(function(){}); }
-  function fail(text){ if(msg){ msg.querySelector('.ring').style.display='none'; msg.querySelector('p').textContent=text||'Playback failed.'; } }
-
-  var script=document.createElement('script');
-  script.src='https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js';
-  script.onload=function(){
+  var hlsInstance=null;
+  var retries=0;
+  function ready(hlsRef){
+    if(msg){msg.remove(); msg=null;}
+    video.muted=false; video.play().catch(function(){});
+    buildQualityUI(hlsRef);
+  }
+  function fail(text){
+    if(!msg)return;
+    msg.querySelector('.ring').style.display='none';
+    msg.querySelector('p').innerHTML=(text||'Playback failed.')+'<br><span style="opacity:.65;font-size:11px">This is usually the source CDN blocking cross-site playback, or an expired stream token.</span>';
+  }
+  function buildQualityUI(hlsRef){
+    var row=eid('qualityRow');
+    if(!row)return;
+    if(!hlsRef || !hlsRef.levels || !hlsRef.levels.length){
+      row.innerHTML='<span class="quality-note">Quality is managed automatically by your device.</span>';
+      return;
+    }
+    var html='<button class="quality-btn active" data-level="-1">Auto</button>';
+    hlsRef.levels.forEach(function(lvl,i){
+      var label=lvl.height?lvl.height+'p':Math.round((lvl.bitrate||0)/1000)+'kbps';
+      html+='<button class="quality-btn" data-level="'+i+'">'+label+'</button>';
+    });
+    row.innerHTML=html;
+    row.querySelectorAll('.quality-btn').forEach(function(btn){
+      btn.onclick=function(){
+        row.querySelectorAll('.quality-btn').forEach(function(b){b.classList.remove('active');});
+        btn.classList.add('active');
+        hlsRef.currentLevel=parseInt(btn.getAttribute('data-level'),10);
+      };
+    });
+  }
+  function attach(){
     if(window.Hls && Hls.isSupported()){
-      var hls=new Hls({});
-      hls.loadSource(sourceUrl);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED,ready);
-      hls.on(Hls.Events.ERROR,function(evt,data){ if(data && data.fatal) fail('Stream unavailable ('+data.type+').'); });
+      hlsInstance=new Hls({ maxBufferLength:30, liveSyncDuration:6 });
+      hlsInstance.loadSource(sourceUrl);
+      hlsInstance.attachMedia(video);
+      hlsInstance.on(Hls.Events.MANIFEST_PARSED,function(){ ready(hlsInstance); });
+      hlsInstance.on(Hls.Events.ERROR,function(evt,data){
+        if(!data || !data.fatal)return;
+        if((data.type===Hls.ErrorTypes.NETWORK_ERROR||data.type===Hls.ErrorTypes.MEDIA_ERROR) && retries<2){
+          retries++;
+          try{ data.type===Hls.ErrorTypes.NETWORK_ERROR?hlsInstance.startLoad():hlsInstance.recoverMediaError(); }catch(e){}
+          return;
+        }
+        fail('Stream unavailable ('+data.type+').');
+      });
     }else if(video.canPlayType('application/vnd.apple.mpegurl')){
       video.src=sourceUrl;
-      video.addEventListener('loadedmetadata',ready);
+      video.addEventListener('loadedmetadata',function(){ ready(null); });
       video.addEventListener('error',function(){fail('Stream unavailable.');});
     }else{
       fail('Your browser cannot play this stream format.');
     }
-  };
-  script.onerror=function(){ fail('Could not load the video player.'); };
-  document.head.appendChild(script);
-
+  }
+  if(window.Hls){ attach(); }
+  else{
+    var script=document.createElement('script');
+    script.src='https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js';
+    script.onload=attach;
+    script.onerror=function(){ fail('Could not load the video player library.'); };
+    document.head.appendChild(script);
+  }
   if('wakeLock' in navigator){ navigator.wakeLock.request('screen').catch(function(){}); }
 }
-
+/* ── EVENT DETAILS (category + everything else the feed gives us) ── */
+function setupDetails(m,start){
+  var section=eid('detailsSection');
+  var catKey=fcCatClass(m.category);
+  var catClass=['cricket','tennis','golf','formula1','motorsports'].indexOf(catKey)>-1?'cat-'+catKey:'cat-default';
+  var qualities=[];
+  if(m.auto_streams){
+    Object.keys(m.auto_streams).forEach(function(lang){
+      var streams=(m.auto_streams[lang]&&m.auto_streams[lang].streams)||{};
+      Object.keys(streams).forEach(function(q){ if(qualities.indexOf(q)===-1)qualities.push(q); });
+    });
+  }
+  var qualityOrder=['240p','360p','480p','540p','720p','1080p'];
+  qualities.sort(function(a,b){return qualityOrder.indexOf(a)-qualityOrder.indexOf(b);});
+  section.innerHTML='<div class="section-head"><span class="dot"></span><span class="section-title">Event Details</span></div>'
+    +'<div class="section-body">'
+      +'<div class="details-grid">'
+        +'<div class="detail-item"><span class="detail-label">Category</span><span class="detail-value"><span class="cat-badge '+catClass+'">'+esc(m.category||'—')+'</span></span></div>'
+        +'<div class="detail-item"><span class="detail-label">Tournament</span><span class="detail-value">'+esc(m.tournament||'—')+'</span></div>'
+        +'<div class="detail-item"><span class="detail-label">Language</span><span class="detail-value">'+esc(m.language||'—')+'</span></div>'
+        +'<div class="detail-item"><span class="detail-label">Match ID</span><span class="detail-value">#'+esc(m.match_id)+'</span></div>'
+        +'<div class="detail-item"><span class="detail-label">Start Time</span><span class="detail-value">'+fmtFull(start)+'</span></div>'
+        +'<div class="detail-item"><span class="detail-label">Status</span><span class="detail-value">'+esc(m.status||'—')+'</span></div>'
+      +'</div>'
+      +(qualities.length?'<div class="detail-item" style="margin-top:14px"><span class="detail-label">Available Qualities</span><div class="quality-row">'+qualities.map(function(q){return '<span class="quality-chip">'+q+'</span>';}).join('')+'</div></div>':'')
+    +'</div>';
+}
 /* ── PREDICTION POLL ── */
 function setupPrediction(m){
   var section=eid('predictSection');
@@ -332,34 +381,18 @@ function setupPrediction(m){
   var teamA=vsMatch[1].trim(), teamB=vsMatch[2].trim();
   var key='ssnap_vote_'+m.match_id;
   var countsKey='ssnap_votecounts_'+m.match_id;
-
-  // Seed a stable pseudo base count per match so the poll doesn't look empty on first visit.
-  // These numbers are simulated on your device only — this is a static page with no shared
-  // backend, so vote totals aren't synced across visitors.
-  function seedHash(str){
-    var h=0;
-    for(var i=0;i<str.length;i++){h=(h*31+str.charCodeAt(i))|0;}
-    return Math.abs(h);
-  }
-  var counts=JSON.parse(localStorage.getItem(countsKey)||'null');
-  if(!counts){
-    var base=40+(seedHash(String(m.match_id))%180);
-    var splitA=30+(seedHash(teamA)%40); // 30–70%
-    counts={A:Math.round(base*splitA/100), B:Math.round(base*(100-splitA)/100)};
-    localStorage.setItem(countsKey,JSON.stringify(counts));
-  }
+  var counts=JSON.parse(localStorage.getItem(countsKey)||'null')||{A:0,B:0};
   var myVote=localStorage.getItem(key);
-
   function render(){
-    var total=counts.A+counts.B||1;
-    var pctA=Math.round(counts.A/total*100), pctB=100-pctA;
+    var total=counts.A+counts.B;
+    var pctA=total?Math.round(counts.A/total*100):50, pctB=total?100-pctA:50;
     section.innerHTML='<div class="section-head"><span class="dot"></span><span class="section-title">Who will win?</span></div>'
       +'<div class="section-body">'
         +'<div class="predict-teams">'
-          +'<div class="predict-btn'+(myVote?' voted':'')+(myVote==='A'?' chosen':'')+'" data-pick="A"><span class="pb-fill" style="width:'+pctA+'%"></span><span class="pb-name">'+esc(teamA)+'</span><span class="pb-pct">'+pctA+'%</span></div>'
-          +'<div class="predict-btn'+(myVote?' voted':'')+(myVote==='B'?' chosen':'')+'" data-pick="B"><span class="pb-fill" style="width:'+pctB+'%"></span><span class="pb-name">'+esc(teamB)+'</span><span class="pb-pct">'+pctB+'%</span></div>'
+          +'<div class="predict-btn'+(myVote?' voted':'')+(myVote==='A'?' chosen':'')+'" data-pick="A"><span class="pb-fill" style="width:'+(total?pctA:0)+'%"></span><span class="pb-name">'+esc(teamA)+'</span><span class="pb-pct">'+(total?pctA+'%':'—')+'</span></div>'
+          +'<div class="predict-btn'+(myVote?' voted':'')+(myVote==='B'?' chosen':'')+'" data-pick="B"><span class="pb-fill" style="width:'+(total?pctB:0)+'%"></span><span class="pb-name">'+esc(teamB)+'</span><span class="pb-pct">'+(total?pctB+'%':'—')+'</span></div>'
         +'</div>'
-        +'<div class="predict-note">'+total+' votes · tap a team to vote'+(myVote?' · you voted '+esc(myVote==='A'?teamA:teamB):'')+'</div>'
+        +'<div class="predict-note">'+total+' vote'+(total===1?'':'s')+' · tap a team to vote'+(myVote?' · you voted '+esc(myVote==='A'?teamA:teamB):'')+'</div>'
       +'</div>';
     section.querySelectorAll('.predict-btn').forEach(function(btn){
       btn.onclick=function(){
@@ -375,22 +408,15 @@ function setupPrediction(m){
   }
   render();
 }
-
-/* ── COMMENTS ──
-   Stored in this browser's localStorage only (this is a static page with no server), so
-   comments are visible on the device that posted them, not shared across all visitors.
-   For a real shared comment wall you'd need a small backend (e.g. Firebase/Supabase) —
-   happy to wire that up if you want it. */
+/* ── COMMENTS ── */
 function setupComments(m){
   var storeKey='ssnap_comments_'+m.match_id;
   var list=eid('commentList');
   var nameInput=eid('cName');
   var textInput=eid('cText');
   var postBtn=eid('postBtn');
-
   var savedName=localStorage.getItem('ssnap_username');
   if(savedName)nameInput.value=savedName;
-
   function getComments(){ return JSON.parse(localStorage.getItem(storeKey)||'[]'); }
   function timeAgo(ts){
     var diff=Date.now()-ts, m=Math.floor(diff/60000);
@@ -411,7 +437,6 @@ function setupComments(m){
     }).join('');
   }
   renderList();
-
   postBtn.onclick=function(){
     var name=nameInput.value.trim()||'Guest';
     var text=textInput.value.trim();
