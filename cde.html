@@ -307,124 +307,135 @@ function updateStatus(m,start,isLiveFixed){
 function setupPlayer(m, isLive) {
   var wrap = eid('playerWrap');
   
-  // === Proxy URL ===
+  // === Proxy ===
   const PROXY = "https://fuck-you.kasin-tv.com/fc/proxy.php/";
   
-  // === Get original stream URL (auto_streams preferred) ===
-  let originalUrl = '';
+  // === Get best source and all available streams ===
+  let sourceUrl = '';
+  let availableStreams = {};   // For quality selector
   
   if (m.auto_streams && m.auto_streams.ENGLISH && m.auto_streams.ENGLISH.streams) {
-    const streams = m.auto_streams.ENGLISH.streams;
-    originalUrl = streams['1080p'] || streams['720p'] || streams['540p'] || 
-                  streams['480p'] || streams['360p'] || streams['240p'] || '';
+    availableStreams = m.auto_streams.ENGLISH.streams;
+    // Prefer highest quality
+    sourceUrl = availableStreams['1080p'] || availableStreams['720p'] || 
+                availableStreams['540p'] || availableStreams['480p'] || 
+                availableStreams['360p'] || availableStreams['240p'] || '';
   }
   
-  if (!originalUrl && m.streams && m.streams.primary) {
-    originalUrl = m.streams.primary;
+  if (!sourceUrl && m.streams && m.streams.primary) {
+    sourceUrl = m.streams.primary;
+    availableStreams = {}; // fallback, will use hls.js levels
   }
 
-  // === Apply Proxy ===
-  let sourceUrl = originalUrl ? PROXY + originalUrl : '';
+  // Apply Proxy
+  sourceUrl = sourceUrl ? PROXY + sourceUrl : '';
 
   if(!isLive || !sourceUrl){
-    wrap.innerHTML='<div class="player-msg"><p>'+(isLive?'No playable stream is available for this event right now.':'The player will appear here once this event goes live.')+'</p></div>';
+    wrap.innerHTML = '<div class="player-msg"><p>' + 
+      (isLive ? 'No playable stream is available for this event right now.' : 
+                'The player will appear here once this event goes live.') + 
+      '</p></div>';
     return;
   }
 
-  wrap.innerHTML=
-    '<video id="fcVideo" controls playsinline muted></video>'
-    +'<div class="player-overlay player-logo"><img src="https://i.ibb.co/BTM5dLF/sportssnap-logo.png" alt="Sports Snap"/></div>'
-    +'<div class="player-overlay player-watermark">sportssnap.net</div>'
-    +'<div class="player-msg" id="playerMsg"><div class="ring"></div><p>Loading stream via proxy…</p></div>';
+  wrap.innerHTML =
+    '<video id="fcVideo" controls playsinline muted></video>' +
+    '<div class="player-overlay player-logo"><img src="https://i.ibb.co/BTM5dLF/sportssnap-logo.png" alt="Sports Snap"/></div>' +
+    '<div class="player-overlay player-watermark">sportssnap.net</div>' +
+    '<div class="player-msg" id="playerMsg"><div class="ring"></div><p>Loading stream via proxy…</p></div>';
 
   var video = eid('fcVideo');
   var msg = eid('playerMsg');
   var hlsInstance = null;
-  var retries = 0;
+  var currentQuality = 'Auto';
 
-  function ready(hlsRef){
-    if(msg){msg.remove(); msg=null;}
+  function ready() {
+    if (msg) { msg.remove(); msg = null; }
     video.muted = false;
-    video.play().catch(function(){});
-    buildQualityUI(hlsRef);
+    video.play().catch(() => {});
+    buildQualityUI();
   }
 
-  function fail(text){
-    if(!msg) return;
-    msg.querySelector('.ring').style.display='none';
-    msg.querySelector('p').innerHTML = (text||'Playback failed.') + 
-      '<br><span style="opacity:.65;font-size:11px">Proxy error or token expired.</span>';
+  function fail(text) {
+    if (!msg) return;
+    msg.querySelector('.ring').style.display = 'none';
+    msg.querySelector('p').innerHTML = (text || 'Playback failed.') + 
+      '<br><span style="opacity:.65;font-size:11px">Proxy or token issue.</span>';
   }
 
-  function buildQualityUI(hlsRef){
+  // Custom Quality Selector using auto_streams data
+  function buildQualityUI() {
     var row = eid('qualityRow');
-    if(!row) return;
+    if (!row) return;
+
+    let html = '<button class="quality-btn active" data-url="' + sourceUrl + '">Auto (Best)</button>';
+
+    // Add all available qualities from auto_streams
+    const qualityOrder = ['1080p', '720p', '540p', '480p', '360p', '240p'];
     
-    if(!hlsRef || !hlsRef.levels || !hlsRef.levels.length){
-      row.innerHTML = '<span class="quality-note">Quality is managed automatically.</span>';
-      return;
-    }
-    
-    var html = '<button class="quality-btn active" data-level="-1">Auto</button>';
-    hlsRef.levels.forEach(function(lvl,i){
-      var label = lvl.height ? lvl.height + 'p' : Math.round((lvl.bitrate||0)/1000) + 'kbps';
-      html += '<button class="quality-btn" data-level="'+i+'">'+label+'</button>';
+    qualityOrder.forEach(q => {
+      if (availableStreams[q]) {
+        const proxiedUrl = PROXY + availableStreams[q];
+        html += `<button class="quality-btn" data-url="${proxiedUrl}">${q}</button>`;
+      }
     });
+
     row.innerHTML = html;
 
-    row.querySelectorAll('.quality-btn').forEach(function(btn){
-      btn.onclick = function(){
+    row.querySelectorAll('.quality-btn').forEach(btn => {
+      btn.onclick = function() {
         row.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        if(hlsRef) hlsRef.currentLevel = parseInt(btn.getAttribute('data-level'),10);
+        
+        const newUrl = btn.getAttribute('data-url');
+        if (newUrl) {
+          if (hlsInstance) {
+            hlsInstance.destroy();
+            hlsInstance = null;
+          }
+          video.src = newUrl;   // Switch source
+          video.load();
+          video.play().catch(() => {});
+        }
       };
     });
   }
 
-  function attach(){
-    if(window.Hls && Hls.isSupported()){
-      hlsInstance = new Hls({
-        maxBufferLength: 30,
-        liveSyncDuration: 6,
-        xhrSetup: function(xhr) {
-          xhr.withCredentials = false;
-        }
-      });
+  function attach() {
+    if (window.Hls && Hls.isSupported() && Object.keys(availableStreams).length === 0) {
+      // Fallback for primary streams
+      hlsInstance = new Hls({ maxBufferLength: 30, liveSyncDuration: 6 });
       hlsInstance.loadSource(sourceUrl);
       hlsInstance.attachMedia(video);
-      hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => ready(hlsInstance));
-      hlsInstance.on(Hls.Events.ERROR, function(evt,data){
-        if(!data || !data.fatal) return;
-        if((data.type===Hls.ErrorTypes.NETWORK_ERROR || data.type===Hls.ErrorTypes.MEDIA_ERROR) && retries<3){
+      hlsInstance.on(Hls.Events.MANIFEST_PARSED, ready);
+      hlsInstance.on(Hls.Events.ERROR, (evt, data) => {
+        if (data && data.fatal && retries < 2) {
           retries++;
-          try{ 
-            data.type===Hls.ErrorTypes.NETWORK_ERROR ? hlsInstance.startLoad() : hlsInstance.recoverMediaError(); 
-          }catch(e){}
-          return;
+          try { hlsInstance.recoverMediaError(); } catch(e) {}
+        } else {
+          fail('Stream unavailable.');
         }
-        fail('Stream unavailable through proxy.');
       });
-    } else if(video.canPlayType('application/vnd.apple.mpegurl')){
-      video.src = sourceUrl;
-      video.addEventListener('loadedmetadata', () => ready(null));
-      video.addEventListener('error', () => fail('Stream unavailable.'));
     } else {
-      fail('Your browser cannot play this stream.');
+      // For auto_streams we use native video + manual quality switch
+      video.src = sourceUrl;
+      video.addEventListener('loadedmetadata', ready);
+      video.addEventListener('error', () => fail('Stream unavailable.'));
     }
   }
 
-  if(window.Hls){
+  if (window.Hls) {
     attach();
   } else {
     var script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js';
     script.onload = attach;
-    script.onerror = () => fail('Could not load player library.');
+    script.onerror = () => fail('Could not load player.');
     document.head.appendChild(script);
   }
 
-  if('wakeLock' in navigator){
-    navigator.wakeLock.request('screen').catch(function(){});
+  if ('wakeLock' in navigator) {
+    navigator.wakeLock.request('screen').catch(() => {});
   }
 }
 /* ── EVENT DETAILS (category + everything else the feed gives us) ── */
