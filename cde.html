@@ -304,23 +304,27 @@ function updateStatus(m,start,isLiveFixed){
    expired — not something this page can or should work around. If you have your own
    licensed stream URL, put it in `sourceUrl` and this player will handle it as normal.
 */
-function setupPlayer(m,isLive){
-  var wrap=eid('playerWrap');
+function setupPlayer(m, isLive) {
+  var wrap = eid('playerWrap');
   
-  // === NEW LOGIC: Prefer auto_streams ENGLISH 720p/1080p, fallback to primary ===
-  let sourceUrl = '';
+  // === Proxy URL ===
+  const PROXY = "https://fuck-you.kasin-tv.com/fc/proxy.php/";
+  
+  // === Get original stream URL (auto_streams preferred) ===
+  let originalUrl = '';
   
   if (m.auto_streams && m.auto_streams.ENGLISH && m.auto_streams.ENGLISH.streams) {
     const streams = m.auto_streams.ENGLISH.streams;
-    // Prefer highest quality available
-    sourceUrl = streams['1080p'] || streams['720p'] || streams['540p'] || 
-                streams['480p'] || streams['360p'] || streams['240p'] || '';
+    originalUrl = streams['1080p'] || streams['720p'] || streams['540p'] || 
+                  streams['480p'] || streams['360p'] || streams['240p'] || '';
   }
   
-  // Fallback to primary if auto_streams not available
-  if (!sourceUrl && m.streams && m.streams.primary) {
-    sourceUrl = m.streams.primary;
+  if (!originalUrl && m.streams && m.streams.primary) {
+    originalUrl = m.streams.primary;
   }
+
+  // === Apply Proxy ===
+  let sourceUrl = originalUrl ? PROXY + originalUrl : '';
 
   if(!isLive || !sourceUrl){
     wrap.innerHTML='<div class="player-msg"><p>'+(isLive?'No playable stream is available for this event right now.':'The player will appear here once this event goes live.')+'</p></div>';
@@ -331,16 +335,16 @@ function setupPlayer(m,isLive){
     '<video id="fcVideo" controls playsinline muted></video>'
     +'<div class="player-overlay player-logo"><img src="https://i.ibb.co/BTM5dLF/sportssnap-logo.png" alt="Sports Snap"/></div>'
     +'<div class="player-overlay player-watermark">sportssnap.net</div>'
-    +'<div class="player-msg" id="playerMsg"><div class="ring"></div><p>Loading stream…</p></div>';
+    +'<div class="player-msg" id="playerMsg"><div class="ring"></div><p>Loading stream via proxy…</p></div>';
 
-  var video=eid('fcVideo');
-  var msg=eid('playerMsg');
-  var hlsInstance=null;
-  var retries=0;
+  var video = eid('fcVideo');
+  var msg = eid('playerMsg');
+  var hlsInstance = null;
+  var retries = 0;
 
   function ready(hlsRef){
     if(msg){msg.remove(); msg=null;}
-    video.muted=false; 
+    video.muted = false;
     video.play().catch(function(){});
     buildQualityUI(hlsRef);
   }
@@ -348,47 +352,47 @@ function setupPlayer(m,isLive){
   function fail(text){
     if(!msg) return;
     msg.querySelector('.ring').style.display='none';
-    msg.querySelector('p').innerHTML=(text||'Playback failed.')+'<br><span style="opacity:.65;font-size:11px">Token may have expired or region restricted.</span>';
+    msg.querySelector('p').innerHTML = (text||'Playback failed.') + 
+      '<br><span style="opacity:.65;font-size:11px">Proxy error or token expired.</span>';
   }
 
   function buildQualityUI(hlsRef){
-    var row=eid('qualityRow');
+    var row = eid('qualityRow');
     if(!row) return;
     
     if(!hlsRef || !hlsRef.levels || !hlsRef.levels.length){
-      row.innerHTML='<span class="quality-note">Quality is managed automatically.</span>';
+      row.innerHTML = '<span class="quality-note">Quality is managed automatically.</span>';
       return;
     }
     
-    var html='<button class="quality-btn active" data-level="-1">Auto</button>';
+    var html = '<button class="quality-btn active" data-level="-1">Auto</button>';
     hlsRef.levels.forEach(function(lvl,i){
       var label = lvl.height ? lvl.height + 'p' : Math.round((lvl.bitrate||0)/1000) + 'kbps';
       html += '<button class="quality-btn" data-level="'+i+'">'+label+'</button>';
     });
-    row.innerHTML=html;
+    row.innerHTML = html;
 
     row.querySelectorAll('.quality-btn').forEach(function(btn){
-      btn.onclick=function(){
+      btn.onclick = function(){
         row.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        hlsRef.currentLevel = parseInt(btn.getAttribute('data-level'),10);
+        if(hlsRef) hlsRef.currentLevel = parseInt(btn.getAttribute('data-level'),10);
       };
     });
   }
 
   function attach(){
     if(window.Hls && Hls.isSupported()){
-      hlsInstance = new Hls({ 
-        maxBufferLength: 30, 
+      hlsInstance = new Hls({
+        maxBufferLength: 30,
         liveSyncDuration: 6,
         xhrSetup: function(xhr) {
-          // Optional: helps with some token protected streams
           xhr.withCredentials = false;
         }
       });
       hlsInstance.loadSource(sourceUrl);
       hlsInstance.attachMedia(video);
-      hlsInstance.on(Hls.Events.MANIFEST_PARSED, function(){ ready(hlsInstance); });
+      hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => ready(hlsInstance));
       hlsInstance.on(Hls.Events.ERROR, function(evt,data){
         if(!data || !data.fatal) return;
         if((data.type===Hls.ErrorTypes.NETWORK_ERROR || data.type===Hls.ErrorTypes.MEDIA_ERROR) && retries<3){
@@ -398,32 +402,31 @@ function setupPlayer(m,isLive){
           }catch(e){}
           return;
         }
-        fail('Stream unavailable. Token may be expired.');
+        fail('Stream unavailable through proxy.');
       });
     } else if(video.canPlayType('application/vnd.apple.mpegurl')){
-      video.src=sourceUrl;
-      video.addEventListener('loadedmetadata', function(){ ready(null); });
-      video.addEventListener('error', function(){ fail('Stream unavailable.'); });
+      video.src = sourceUrl;
+      video.addEventListener('loadedmetadata', () => ready(null));
+      video.addEventListener('error', () => fail('Stream unavailable.'));
     } else {
       fail('Your browser cannot play this stream.');
     }
   }
 
-  if(window.Hls){ 
-    attach(); 
+  if(window.Hls){
+    attach();
   } else {
     var script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js';
     script.onload = attach;
-    script.onerror = function(){ fail('Could not load player library.'); };
+    script.onerror = () => fail('Could not load player library.');
     document.head.appendChild(script);
   }
 
-  if('wakeLock' in navigator){ 
-    navigator.wakeLock.request('screen').catch(function(){}); 
+  if('wakeLock' in navigator){
+    navigator.wakeLock.request('screen').catch(function(){});
   }
 }
-
 /* ── EVENT DETAILS (category + everything else the feed gives us) ── */
 function setupDetails(m,start){
   var section=eid('detailsSection');
