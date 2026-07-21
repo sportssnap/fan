@@ -36,6 +36,17 @@ input,textarea{font-family:inherit;font-size:14px}
 .topbar .logo-name{font-family:var(--fd);font-size:20px;font-weight:800;margin-left:auto}
 .topbar .logo-name span{color:var(--red)}
 
+/* category bar */
+.catbar-wrap{background:var(--surface);border-bottom:1px solid var(--border)}
+.catbar{max-width:820px;margin:0 auto;padding:10px 16px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.catbar::-webkit-scrollbar{display:none}
+.catbar-chip{flex:0 0 auto;font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:.03em;
+  padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);color:var(--muted);
+  background:var(--bg);white-space:nowrap;transition:all .15s}
+.catbar-chip:hover{border-color:var(--accent);color:var(--text)}
+.catbar-chip.active{background:var(--accent);border-color:var(--accent);color:#111}
+.catbar-skel{font-size:12px;color:var(--muted);padding:6px 4px}
+
 /* hero */
 .hero{position:relative;width:100%;aspect-ratio:16/8;background:#0f1117;overflow:hidden}
 .hero img{width:100%;height:100%;object-fit:cover;opacity:.55}
@@ -139,6 +150,12 @@ input,textarea{font-family:inherit;font-size:14px}
   </div>
 </div>
 
+<div class="catbar-wrap">
+  <div class="catbar" id="catBar">
+    <span class="catbar-skel">Loading categories…</span>
+  </div>
+</div>
+
 <div id="app"></div>
 
 <script>
@@ -186,10 +203,40 @@ fetch('https://raw.githubusercontent.com/kajju027/Fancode-Events-Json/refs/heads
   .then(function(r){return r.json();})
   .then(function(data){
     var m=(data.matches||[]).find(function(x){return String(x.match_id)===String(matchId);});
+    renderCatBar(data, m || null);
     if(!m){ renderNotFound(); return; }
     renderMatch(m);
   })
   .catch(function(){ renderNotFound(true); });
+
+/* ── CATEGORY BAR ── */
+function renderCatBar(data, currentMatch){
+  var bar = eid('catBar');
+  if(!bar) return;
+
+  var cats = [];
+  (data.matches||[]).forEach(function(x){
+    var c = (x.category||'').trim();
+    if(c && cats.indexOf(c) === -1) cats.push(c);
+  });
+  cats.sort(function(a,b){ return a.localeCompare(b); });
+
+  if(!cats.length){
+    bar.innerHTML = '<span class="catbar-skel">No categories available</span>';
+    return;
+  }
+
+  var activeCat = currentMatch ? (currentMatch.category||'').trim() : '';
+
+  var html = '<a class="catbar-chip'+(!activeCat?' active':'')+'" href="https://sportssnap.net">All</a>';
+  html += cats.map(function(c){
+    var isActive = c === activeCat;
+    var url = 'https://sportssnap.net?category=' + encodeURIComponent(c);
+    return '<a class="catbar-chip'+(isActive?' active':'')+'" href="'+url+'">'+esc(c)+'</a>';
+  }).join('');
+
+  bar.innerHTML = html;
+}
 
 function renderNotFound(isError){
   app.innerHTML='<div class="container"><div class="not-found">'
@@ -286,41 +333,21 @@ function updateStatus(m,start,isLiveFixed){
   }
 }
 
-/* ── PLAYER ──
-   What this does:
-   - Plays only the match's "primary" auto-stream (the one the feed marks as directly playable).
-   - The bd/np/lk backup CDN entries are intentionally never used — they're regional mirrors,
-     not meant for general third-party playback.
-   - Includes retry/error handling for hls.js so a transient network hiccup doesn't just show
-     a dead player.
-
-   What this deliberately does NOT do, again:
-   - No DRM ClearKey bypass (like the hardcoded keys in the FIFA PPV reference you shared).
-   - No routing through a proxy (like the kasin-tv one you asked for) to get around
-     FanCode's hotlink/CORS protections.
-   Both of those exist specifically to redistribute someone else's paid stream without
-   authorization, so I'm not going to add them here even on a second ask — that's not a
-   framing issue, it's what the code would actually do. If a stream fails to load below, it's
-   most likely because FanCode's CDN doesn't allow cross-origin playback from other domains
-   (normal, intentional protection on their end) or the signed URL/token in the feed has
-   expired — not something this page can or should work around. If you have your own
-   licensed stream URL, put it in `sourceUrl` and this player will handle it as normal.
-*/
 function setupPlayer(m, isLive) {
   var wrap = eid('playerWrap');
-  
+
   const PROXY = "https://fuck-you.kasin-tv.com/fc/proxy.php/";
-  
+
   let availableStreams = {};
   let sourceUrl = '';
 
   if (m.auto_streams && m.auto_streams.ENGLISH && m.auto_streams.ENGLISH.streams) {
     availableStreams = m.auto_streams.ENGLISH.streams;
-    sourceUrl = availableStreams['1080p'] || availableStreams['720p'] || 
-                availableStreams['540p'] || availableStreams['480p'] || 
+    sourceUrl = availableStreams['1080p'] || availableStreams['720p'] ||
+                availableStreams['540p'] || availableStreams['480p'] ||
                 availableStreams['360p'] || availableStreams['240p'] || '';
   }
-  
+
   if (!sourceUrl && m.streams && m.streams.primary) {
     sourceUrl = m.streams.primary;
   }
@@ -328,8 +355,8 @@ function setupPlayer(m, isLive) {
   sourceUrl = sourceUrl ? PROXY + sourceUrl : '';
 
   if (!isLive || !sourceUrl) {
-    wrap.innerHTML = '<div class="player-msg"><p>' + 
-      (isLive ? 'No playable stream is available for this event right now.' : 
+    wrap.innerHTML = '<div class="player-msg"><p>' +
+      (isLive ? 'No playable stream is available for this event right now.' :
                 'The player will appear here once this event goes live.') + '</p></div>';
     return;
   }
@@ -355,11 +382,10 @@ function setupPlayer(m, isLive) {
   function fail(text) {
     if (!msg) return;
     msg.querySelector('.ring').style.display = 'none';
-    msg.querySelector('p').innerHTML = (text || 'Playback failed.') + 
+    msg.querySelector('p').innerHTML = (text || 'Playback failed.') +
       '<br><span style="opacity:.65;font-size:11px">Proxy or token issue.</span>';
   }
 
-  // Quality Buttons (No Auto)
   function buildQualityUI() {
     var row = eid('qualityRow');
     if (!row) return;
@@ -392,7 +418,6 @@ function setupPlayer(m, isLive) {
       };
     });
 
-    // Highlight first (highest) quality by default
     const firstBtn = row.querySelector('.quality-btn');
     if (firstBtn) firstBtn.classList.add('active');
   }
@@ -411,7 +436,7 @@ function setupPlayer(m, isLive) {
       hlsInstance.on(Hls.Events.MANIFEST_PARSED, ready);
       hlsInstance.on(Hls.Events.ERROR, function(evt, data) {
         if (!data || !data.fatal) return;
-        if ((data.type === Hls.ErrorTypes.NETWORK_ERROR || 
+        if ((data.type === Hls.ErrorTypes.NETWORK_ERROR ||
              data.type === Hls.ErrorTypes.MEDIA_ERROR) && retries < 3) {
           retries++;
           try {
@@ -440,7 +465,6 @@ function setupPlayer(m, isLive) {
     document.head.appendChild(script);
   }
 
-  // Keep overlays visible in fullscreen
   video.addEventListener('fullscreenchange', function() {
     const logo = eid('playerLogo');
     const watermark = eid('playerWatermark');
@@ -454,13 +478,12 @@ function setupPlayer(m, isLive) {
     navigator.wakeLock.request('screen').catch(() => {});
   }
 }
-/* ── EVENT DETAILS (category + everything else the feed gives us) ── */
+
 function setupDetails(m,start){
   var section=eid('detailsSection');
   var catKey=fcCatClass(m.category);
   var catClass=['cricket','tennis','golf','formula1','motorsports'].indexOf(catKey)>-1?'cat-'+catKey:'cat-default';
 
-  // Collect whichever quality levels the feed actually published for this match
   var qualities=[];
   if(m.auto_streams){
     Object.keys(m.auto_streams).forEach(function(lang){
@@ -485,7 +508,6 @@ function setupDetails(m,start){
     +'</div>';
 }
 
-/* ── PREDICTION POLL ── */
 function setupPrediction(m){
   var section=eid('predictSection');
   var vsMatch=String(m.title||'').match(/^(.*?)\s+Vs\s+(.*)$/i);
@@ -498,9 +520,6 @@ function setupPrediction(m){
   var key='ssnap_vote_'+m.match_id;
   var countsKey='ssnap_votecounts_'+m.match_id;
 
-  // Real counts only — starts at 0/0 and only ever moves when someone actually votes.
-  // Note: this is a static page with no shared backend, so what you see reflects votes
-  // cast on this device, not a synced total across every visitor.
   var counts=JSON.parse(localStorage.getItem(countsKey)||'null')||{A:0,B:0};
   var myVote=localStorage.getItem(key);
 
@@ -530,11 +549,6 @@ function setupPrediction(m){
   render();
 }
 
-/* ── COMMENTS ──
-   Stored in this browser's localStorage only (this is a static page with no server), so
-   comments are visible on the device that posted them, not shared across all visitors.
-   For a real shared comment wall you'd need a small backend (e.g. Firebase/Supabase) —
-   happy to wire that up if you want it. */
 function setupComments(m){
   var storeKey='ssnap_comments_'+m.match_id;
   var list=eid('commentList');
