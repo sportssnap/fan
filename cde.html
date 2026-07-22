@@ -205,16 +205,103 @@ input,textarea{font-family:inherit;font-size:14px}
   .action-btn{width:100%}
   .reaction-bar{gap:6px}
 }
+
+  /* Header Style */
+  :root {
+  --bg:#f5f6f8;--surface:#ffffff;--border:#e4e6eb;--text:#111827;--muted:#6b7280;
+  --accent:#0f4cdb;--red:#e63946;--green:#16a34a;--amber:#f59e0b;
+  --r-sm:6px;--r-md:10px;--r-lg:16px;
+  --sh-sm:0 1px 4px rgba(0,0,0,.06);--sh-md:0 4px 16px rgba(0,0,0,.09);
+  --hdr-h:64px;--tab-h:52px;
+  --fd:'Barlow Condensed',sans-serif;--fb:'DM Sans',sans-serif;
+}
+@keyframes slideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+
+.site-header{position:sticky;top:0;z-index:200;background:var(--surface);border-bottom:1px solid var(--border);box-shadow:var(--sh-sm);height:var(--hdr-h);width:100%}
+.hdr-inner{height:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 16px;max-width:1060px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0;cursor:pointer}
+.logo-img{height:38px;width:auto;display:block;object-fit:contain;}
+.logo-name{font-family:var(--fd);font-size:26px;font-weight:800;letter-spacing:-.01em;line-height:1}
+.logo-name span{color:var(--red)}
+.hdr-nav{display:flex;align-items:center;gap:4px}
+.hdr-nav .nav-link{font-size:13px;font-weight:500;color:var(--muted);padding:6px 12px;border-radius:var(--r-sm);transition:color .2s,background .2s;cursor:pointer;user-select:none}
+.hdr-nav .nav-link:hover{color:var(--text);background:var(--bg)}
+.hdr-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.btn-soc{width:34px;height:34px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;transition:opacity .2s,transform .15s;cursor:pointer}
+.btn-soc:hover{opacity:.85;transform:translateY(-1px)}
+.btn-soc.tg{background:#29b6f6}.btn-soc.yt{background:#ff0000}
+.btn-soc svg{width:16px;height:16px;fill:#fff}
+.btn-night{width:34px;height:34px;border-radius:var(--r-sm);background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;transition:background .2s}
+.btn-night:hover{background:var(--border)}
+.btn-night svg{width:16px;height:16px;stroke:var(--text);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn-ham{display:none;width:34px;height:34px;flex-direction:column;align-items:center;justify-content:center;gap:5px;border-radius:var(--r-sm);background:var(--bg);border:1px solid var(--border)}
+.btn-ham span{width:18px;height:2px;background:var(--text);border-radius:2px;transition:all .3s}
+.btn-ham.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.btn-ham.open span:nth-child(2){opacity:0}
+.btn-ham.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+.mob-nav{display:none;position:fixed;inset:var(--hdr-h) 0 0 0;background:rgba(0,0,0,.4);z-index:190;backdrop-filter:blur(2px)}
+.mob-nav.open{display:block}
+.mob-nav-inner{background:var(--surface);width:260px;height:100%;padding:20px 16px;display:flex;flex-direction:column;gap:6px;animation:slideIn .25s ease;box-shadow:var(--sh-md)}
+.mob-nav-inner .nav-link{padding:10px 14px;border-radius:var(--r-sm);font-weight:500;font-size:15px;color:var(--text);transition:background .2s;display:block;cursor:pointer}
+.mob-nav-inner .nav-link:hover{background:var(--bg)}
+.mob-soc{display:flex;gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+
+body.night{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3a;--text:#e8eaf0;--muted:#7c8098}
+
+@media(max-width:640px){
+  .hdr-nav{display:none}
+  .btn-ham{display:flex}
+}
+  /* Header style End */
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="topbar-inner">
-    <a class="back-link" href="https://sportssnap.net">← <span>Back to Sports Snap</span></a>
-    <div class="logo-name">Sports<span>Snap</span></div>
+  <!-- Header -->
+<header class="site-header" role="banner">
+  <div class="hdr-inner">
+    <div class="logo" onclick="location.href='https://sportssnap.net'" role="link" aria-label="Sports Snap Home">
+      <img class="logo-img" src="https://i.ibb.co/BTM5dLF/sportssnap-logo.png" alt="Sports Snap" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+      <div class="logo-name" style="display:none">Sports<span>Snap</span></div>
+    </div>
+    <nav class="hdr-nav" aria-label="Main navigation">
+      <span class="nav-link" onclick="location.href='https://sportssnap.github.io/footlive/foot'">Football</span>
+<span class="nav-link" onclick="location.href='https://sportssnap.github.io/footlive/foot?cric'">Cricket</span>
+<span class="nav-link" onclick="location.href='https://sportssnap.github.io/footlive/foot?fan'">Fancode</span>
+      <span class="nav-link" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">About</span>
+    </nav>
+    <div class="hdr-actions">
+      <span class="btn-soc tg" onclick="window.open('https://t.me/sportssnapofficial','_blank','noopener')" aria-label="Telegram">
+        <svg viewBox="0 0 24 24"><path d="m9.417 15.181-.397 5.584c.568 0 .814-.244 1.109-.537l2.663-2.545 5.518 4.041c1.012.564 1.725.267 1.998-.931l3.622-16.972c.321-1.496-.541-2.081-1.527-1.714l-21.29 8.151c-1.453.564-1.431 1.374-.247 1.741l5.443 1.693 12.643-7.911c.595-.394 1.136-.176.691.218z"/></svg>
+      </span>
+      <span class="btn-soc yt" onclick="window.open('https://www.youtube.com/channel/sportssnap2023','_blank','noopener')" aria-label="YouTube">
+        <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+      </span>
+      <button class="btn-night" id="nightToggle" aria-label="Toggle dark mode">
+        <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="btn-ham" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile Drawer -->
+<div class="mob-nav" id="mobNav" aria-hidden="true">
+  <div class="mob-nav-inner">
+    <span class="nav-link" onclick="switchTab('foot');closeMobNav()">⚽ Football Live</span>
+    <span class="nav-link" onclick="switchTab('cric');closeMobNav()">🏏 Cricket Live</span>
+    <span class="nav-link" onclick="switchTab('fc');closeMobNav()">📡 Fancode Live</span>
+    <span class="nav-link" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'});closeMobNav()">ℹ️ About</span>
+    <div class="mob-soc">
+      <span class="btn-soc tg" onclick="window.open('https://t.me/sportssnapofficial','_blank')" style="width:38px;height:38px;"><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#fff;"><path d="m9.417 15.181-.397 5.584c.568 0 .814-.244 1.109-.537l2.663-2.545 5.518 4.041c1.012.564 1.725.267 1.998-.931l3.622-16.972c.321-1.496-.541-2.081-1.527-1.714l-21.29 8.151c-1.453.564-1.431 1.374-.247 1.741l5.443 1.693 12.643-7.911c.595-.394 1.136-.176.691.218z"/></svg></span>
+      <span class="btn-soc yt" onclick="window.open('https://www.youtube.com/channel/sportssnap2023','_blank')" style="width:38px;height:38px;"><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#fff;"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></span>
+    </div>
   </div>
 </div>
+
+  <!--header end -->
 
 <div id="app"></div>
 
@@ -807,6 +894,27 @@ function setupComments(m){
     renderList();
   };
 }
+
+  /* Header Script */
+  function eid(id){return document.getElementById(id)}
+
+/* Night Mode */
+if(localStorage.getItem('night')==='1')document.body.classList.add('night');
+eid('nightToggle').addEventListener('click',function(){
+  localStorage.setItem('night',document.body.classList.toggle('night')?'1':'0');
+});
+
+/* Mobile Menu */
+var menuBtn=eid('menuBtn'),mobNav=eid('mobNav');
+function closeMobNav(){menuBtn.classList.remove('open');mobNav.classList.remove('open');menuBtn.setAttribute('aria-expanded','false');mobNav.setAttribute('aria-hidden','true');}
+menuBtn.addEventListener('click',function(){
+  var open=menuBtn.classList.toggle('open');
+  mobNav.classList.toggle('open',open);
+  menuBtn.setAttribute('aria-expanded',String(open));
+  mobNav.setAttribute('aria-hidden',String(!open));
+});
+mobNav.addEventListener('click',function(e){if(e.target===mobNav)closeMobNav();});
+  /* Header Script End */
 </script>
 </body>
 </html>
